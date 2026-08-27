@@ -1,0 +1,178 @@
+'use client';
+
+export default function AboutContent() {
+  return (
+    <div style={{ maxWidth: '420px' }}>
+      {/* Profile Header */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '15px',
+        marginBottom: '15px',
+        padding: '15px',
+        background: 'linear-gradient(135deg, #e8f4ff 0%, #d0e8ff 100%)',
+        borderRadius: '8px',
+        border: '1px solid #b8d4f0'
+      }}>
+        <div style={{
+          width: '80px',
+          height: '80px',
+          background: 'linear-gradient(135deg, #0078d4 0%, #0a246a 100%)',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '40px',
+          flexShrink: 0,
+          border: '3px solid #fff',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+        }}>
+          👨‍💻
+        </div>
+        <div style={{ flex: 1 }}>
+          <h2 style={{ margin: '0 0 4px 0', fontSize: '18px', color: '#0a246a', fontWeight: 'bold' }}>
+            Prasenjit Nayak
+          </h2>
+          <p style={{ margin: 0, color: '#0078d4', fontSize: '12px', fontWeight: 500 }}>
+            Full Stack Developer
+          </p>
+          <p style={{ margin: '6px 0 0 0', color: '#666', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            📍 Odisha, India
+          </p>
+          <div style={{ 
+            marginTop: '8px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: '#d4edda',
+            color: '#155724',
+            padding: '3px 10px',
+            borderRadius: '12px',
+            fontSize: '10px',
+            fontWeight: 500
+          }}>
+            <span style={{
+              width: '6px',
+              height: '6px',
+              background: '#28a745',
+              borderRadius: '50%',
+            }} />
+            Available for work
+          </div>
+        </div>
+      </div>
+
+      {/* Bio */}
+      <div style={{ 
+        fontSize: '11px', 
+        lineHeight: 1.7, 
+        marginBottom: '15px',
+        color: '#444'
+      }}>
+        <p style={{ margin: '0 0 10px' }}>
+          I&apos;ve learned most of my lessons the hard way. Currently <strong>freelancing</strong> and collaborating with new people on exciting projects.
+        </p>
+        <p style={{ margin: 0 }}>
+          I love playing video games, sharing thoughts on tech, and touch typing in my free time.
+        </p>
+      </div>
+
+      {/* Info Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
+        <div style={{
+          background: 'white',
+          border: '1px solid #e0e0e0',
+          borderRadius: '6px',
+          padding: '10px',
+        }}>
+          <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>Education</div>
+          <div style={{ fontSize: '11px', fontWeight: 500, color: '#333' }}>B.Tech in CS & IT</div>
+          <div style={{ fontSize: '10px', color: '#666' }}>Trident Academy of Technology</div>
+        </div>
+        <div style={{
+          background: 'white',
+          border: '1px solid #e0e0e0',
+          borderRadius: '6px',
+          padding: '10px',
+        }}>
+          <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>Experience</div>
+          <div style={{ fontSize: '11px', fontWeight: 500, color: '#333' }}>Freelance Developer</div>
+          <div style={{ fontSize: '10px', color: '#666' }}>v0 Ambassador by Vercel</div>
+        </div>
+      </div>
+
+      {/* Achievements */}
+      <div style={{
+        background: 'linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%)',
+        border: '1px solid #ffc107',
+        borderRadius: '6px',
+        padding: '12px',
+        marginBottom: '15px'
+      }}>
+        <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#856404', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          🏆 Achievements
+        </div>
+        <div style={{ fontSize: '11px', color: '#856404' }}>
+          <div style={{ marginBottom: '4px' }}>• Smart India Hackathon 2022 - EducationX</div>
+          <div style={{ marginBottom: '4px' }}>• Smart India Hackathon 2023 - NexusLink</div>
+          <div>• v0 Ambassador by Vercel</div>
+        </div>
+      </div>
+
+      {/* Social Links */}
+      <div style={{ 
+        display: 'flex',
+        gap: '8px',
+        flexWrap: 'wrap'
+      }}>
+        <button 
+          className="xp-button"
+          onClick={() => window.open('https://github.com/StarKnightt', '_blank')}
+          style={{ flex: 1 }}
+        >
+          💻 GitHub
+        </button>
+        <button 
+          className="xp-button"
+          onClick={() => window.open('https://youtube.com/@Star_Knight12', '_blank')}
+          style={{ flex: 1 }}
+        >
+          📺 YouTube
+        </button>
+        <button 
+          className="xp-button"
+          onClick={() => window.open('https://linkedin.com/in/prasenjitnayak', '_blank')}
+          style={{ flex: 1 }}
+        >
+          💼 LinkedIn
+        </button>
+      </div>
+
+      {/* Portfolio Source */}
+      <button 
+        className="xp-button"
+        onClick={() => window.open('https://github.com/StarKnightt/windows-xp-portfolio', '_blank')}
+        style={{ 
+          width: '100%', 
+          marginTop: '8px',
+          background: 'linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%)',
+          color: '#fff',
+          border: '1px solid #444',
+        }}
+      >
+        ⭐ View Portfolio Source Code
+      </button>
+
+      <p style={{ 
+        fontSize: '9px', 
+        color: '#888', 
+        textAlign: 'center', 
+        marginTop: '15px',
+        paddingTop: '10px',
+        borderTop: '1px solid #e0e0e0'
+      }}>
+        © {new Date().getFullYear()} Prasenjit Nayak • Windows XP Portfolio Edition
+      </p>
+    </div>
+  );
+}

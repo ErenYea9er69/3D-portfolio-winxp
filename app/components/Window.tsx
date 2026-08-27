@@ -1,0 +1,263 @@
+'use client';
+
+import { useState, useRef, useEffect, useCallback, ReactNode } from 'react';
+
+interface WindowProps {
+  id: string;
+  title: string;
+  icon: string;
+  children: ReactNode;
+  isActive: boolean;
+  isMinimized: boolean;
+  initialPosition: { x: number; y: number };
+  initialSize: { width: number; height: number };
+  zIndex: number;
+  onFocus: () => void;
+  onClose: () => void;
+  onMinimize: () => void;
+}
+
+export default function Window({
+  id,
+  title,
+  icon,
+  children,
+  isActive,
+  isMinimized,
+  initialPosition,
+  initialSize,
+  zIndex,
+  onFocus,
+  onClose,
+  onMinimize,
+}: WindowProps) {
+  const [position, setPosition] = useState(initialPosition);
+  const [size, setSize] = useState(initialSize);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [restoreState, setRestoreState] = useState({ position: initialPosition, size: initialSize });
+  const [isDragging, setIsDragging] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [isOpening, setIsOpening] = useState(true);
+  const dragStart = useRef({ x: 0, y: 0 });
+  const windowRef = useRef<HTMLDivElement>(null);
+
+  const taskbarHeight = 30;
+
+  // Constrain position within viewport bounds
+  const constrainPosition = useCallback((x: number, y: number, currentSize: { width: number; height: number }) => {
+    const titleBarHeight = 28;
+    const minVisibleWidth = 100;
+    const minVisibleHeight = titleBarHeight;
+    
+    const maxX = window.innerWidth - minVisibleWidth;
+    const maxY = window.innerHeight - taskbarHeight - minVisibleHeight;
+    const minX = -(currentSize.width - minVisibleWidth);
+    const minY = 0;
+
+    return {
+      x: Math.min(Math.max(x, minX), maxX),
+      y: Math.min(Math.max(y, minY), maxY),
+    };
+  }, []);
+
+  // Ensure window is within bounds on mount and resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (isMaximized) {
+        setPosition({ x: 0, y: 0 });
+        setSize({ width: window.innerWidth, height: window.innerHeight - taskbarHeight });
+      } else {
+        setPosition(prev => constrainPosition(prev.x, prev.y, size));
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    // Initial constraint check
+    if (!isMaximized) {
+      setPosition(prev => constrainPosition(prev.x, prev.y, size));
+    }
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, [constrainPosition, isMaximized, size]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsOpening(false), 120);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('.xp-window-controls')) return;
+    if (isMaximized) return; // Don't allow dragging when maximized
+    
+    setIsDragging(true);
+    dragStart.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+    onFocus();
+    e.preventDefault();
+  }, [position, onFocus, isMaximized]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if ((e.target as HTMLElement).closest('.xp-window-controls')) return;
+    if (isMaximized) return;
+    
+    const touch = e.touches[0];
+    setIsDragging(true);
+    dragStart.current = {
+      x: touch.clientX - position.x,
+      y: touch.clientY - position.y,
+    };
+    onFocus();
+  }, [position, onFocus, isMaximized]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      
+      const newX = e.clientX - dragStart.current.x;
+      const newY = e.clientY - dragStart.current.y;
+      const constrained = constrainPosition(newX, newY, size);
+      
+      setPosition(constrained);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging) return;
+      
+      const touch = e.touches[0];
+      const newX = touch.clientX - dragStart.current.x;
+      const newY = touch.clientY - dragStart.current.y;
+      const constrained = constrainPosition(newX, newY, size);
+      
+      setPosition(constrained);
+      e.preventDefault();
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    const handleTouchEnd = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDragging, constrainPosition, size]);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(onClose, 80);
+  };
+
+  const handleMaximize = () => {
+    if (isMaximized) {
+      // Restore to previous size and position
+      setPosition(restoreState.position);
+      setSize(restoreState.size);
+      setIsMaximized(false);
+    } else {
+      // Save current state and maximize
+      setRestoreState({ position, size });
+      setPosition({ x: 0, y: 0 });
+      setSize({ width: window.innerWidth, height: window.innerHeight - taskbarHeight });
+      setIsMaximized(true);
+    }
+    onFocus();
+  };
+
+  const handleTitleBarDoubleClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('.xp-window-controls')) return;
+    handleMaximize();
+  };
+
+  if (isMinimized) return null;
+
+  return (
+    <div
+      ref={windowRef}
+      className={`xp-window ${isOpening ? 'window-opening' : ''} ${isClosing ? 'window-closing' : ''}`}
+      style={{
+        position: 'absolute',
+        left: position.x,
+        top: position.y,
+        width: size.width,
+        height: size.height,
+        zIndex,
+        cursor: isDragging ? 'grabbing' : 'default',
+        touchAction: 'none',
+        borderRadius: isMaximized ? 0 : undefined,
+        transition: isMaximized || restoreState ? 'none' : undefined,
+      }}
+      onMouseDown={onFocus}
+    >
+      <div 
+        className={`xp-window-title ${isActive ? '' : 'inactive'}`}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        onDoubleClick={handleTitleBarDoubleClick}
+        style={{ 
+          cursor: isMaximized ? 'default' : (isDragging ? 'grabbing' : 'grab'),
+          borderRadius: isMaximized ? 0 : undefined,
+        }}
+      >
+        <div className="xp-window-title-icon">{icon}</div>
+        <span className="xp-window-title-text">{title}</span>
+        <div className="xp-window-controls">
+          <button 
+            className="xp-window-btn xp-window-btn-minimize"
+            onClick={onMinimize}
+            title="Minimize"
+          >
+            <svg width="9" height="9" viewBox="0 0 9 9">
+              <rect x="1" y="7" width="7" height="2" fill="white"/>
+            </svg>
+          </button>
+          <button 
+            className="xp-window-btn xp-window-btn-maximize"
+            onClick={handleMaximize}
+            title={isMaximized ? "Restore" : "Maximize"}
+          >
+            {isMaximized ? (
+              // Restore icon (two overlapping squares)
+              <svg width="9" height="9" viewBox="0 0 9 9">
+                <rect x="2" y="0" width="6" height="6" fill="none" stroke="white" strokeWidth="1.2"/>
+                <rect x="0" y="2" width="6" height="6" fill="black" stroke="white" strokeWidth="1.2"/>
+              </svg>
+            ) : (
+              // Maximize icon (single square)
+              <svg width="9" height="9" viewBox="0 0 9 9">
+                <rect x="1" y="1" width="7" height="7" fill="none" stroke="white" strokeWidth="1.5"/>
+              </svg>
+            )}
+          </button>
+          <button 
+            className="xp-window-btn xp-window-btn-close"
+            onClick={handleClose}
+            title="Close"
+          >
+            <svg width="9" height="9" viewBox="0 0 9 9">
+              <path d="M1 1L8 8M8 1L1 8" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="xp-window-content">
+        {children}
+      </div>
+    </div>
+  );
+}
