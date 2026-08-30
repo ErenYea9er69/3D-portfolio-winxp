@@ -309,6 +309,7 @@ const desktopIcons = [
   { id: 'paint', icon: '🎨', label: 'Paint' },
   { id: 'snake', icon: '🐍', label: 'Snake' },
   { id: 'help', icon: '❓', label: 'Help' },
+  { id: 'recycle', icon: '🗑️', label: 'Recycle Bin' },
 ];
 
 const menuItems = [
@@ -795,7 +796,7 @@ export default function Desktop({ onLogOff }: DesktopProps) {
               gridAutoFlow: 'column',
               gap: '4px',
               alignContent: 'start',
-              width: '160px',
+              width: '240px',
             }}
           >
             {desktopIcons.map(iconData => (
@@ -871,34 +872,7 @@ export default function Desktop({ onLogOff }: DesktopProps) {
           />
         )}
 
-        {/* Recycle Bin at bottom right - fixed position */}
-        <div
-          className="xp-desktop-icons"
-          style={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '10px',
-          }}
-        >
-          <DesktopIcon
-            icon="🗑️"
-            label="Recycle Bin"
-            isSelected={selectedIcons.has('recycle')}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (e.ctrlKey || e.metaKey) toggleSelect('recycle');
-              else selectOnly('recycle');
-              setContextMenu(null);
-            }}
-            onDoubleClick={() => openWindow('recycle')}
-            onContextMenu={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              selectOnly('recycle');
-              handleContextMenu(e, 'icon', 'recycle');
-            }}
-          />
-        </div>
+
 
         {/* Windows */}
         {openWindows.map(window => (
