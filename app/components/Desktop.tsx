@@ -791,12 +791,11 @@ export default function Desktop({ onLogOff }: DesktopProps) {
               left: '10px',
               bottom: '10px',
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, 75px)',
               gridTemplateRows: 'repeat(auto-fill, 80px)',
               gridAutoFlow: 'column',
+              gridAutoColumns: '75px',
               gap: '4px',
               alignContent: 'start',
-              width: '240px',
             }}
           >
             {desktopIcons.map(iconData => (
