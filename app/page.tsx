@@ -225,6 +225,18 @@ function SleepScreen({ onWakeUp }: { onWakeUp: () => void }) {
         }}
       />
 
+      {/* SVG Filter for removing white background */}
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <filter id="remove-white" colorInterpolationFilters="sRGB">
+          <feColorMatrix type="matrix" values="
+            1 0 0 0 0
+            0 1 0 0 0
+            0 0 1 0 0
+            -3 -3 -3 0 8.8
+          " />
+        </filter>
+      </svg>
+
       {/* Dance GIFs */}
       <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', zIndex: 2 }}>
         {[1, 2, 3, 4].map((i) => (
@@ -237,6 +249,7 @@ function SleepScreen({ onWakeUp }: { onWakeUp: () => void }) {
               height: '120px',
               objectFit: 'contain',
               animation: 'sleepFadeIn 1s ease-out',
+              filter: 'url(#remove-white)',
             }}
           />
         ))}
