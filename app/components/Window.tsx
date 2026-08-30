@@ -17,6 +17,22 @@ interface WindowProps {
   onMinimize: () => void;
 }
 
+type ResizeDir = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+
+const RESIZE_CURSORS: Record<ResizeDir, string> = {
+  n: 'ns-resize',
+  s: 'ns-resize',
+  e: 'ew-resize',
+  w: 'ew-resize',
+  ne: 'nesw-resize',
+  sw: 'nesw-resize',
+  nw: 'nwse-resize',
+  se: 'nwse-resize',
+};
+
+const MIN_WIDTH = 220;
+const MIN_HEIGHT = 140;
+
 export default function Window({
   id,
   title,
@@ -36,9 +52,11 @@ export default function Window({
   const [isMaximized, setIsMaximized] = useState(false);
   const [restoreState, setRestoreState] = useState({ position: initialPosition, size: initialSize });
   const [isDragging, setIsDragging] = useState(false);
+  const [resizeDir, setResizeDir] = useState<ResizeDir | null>(null);
   const [isClosing, setIsClosing] = useState(false);
   const [isOpening, setIsOpening] = useState(true);
   const dragStart = useRef({ x: 0, y: 0 });
+  const resizeStart = useRef({ x: 0, y: 0, width: 0, height: 0, left: 0, top: 0 });
   const windowRef = useRef<HTMLDivElement>(null);
 
   const taskbarHeight = 30;
@@ -112,15 +130,60 @@ export default function Window({
     onFocus();
   }, [position, onFocus, isMaximized]);
 
+  const handleResizeStart = useCallback((dir: ResizeDir) => (e: React.MouseEvent) => {
+    if (isMaximized) return;
+    e.stopPropagation();
+    e.preventDefault();
+    onFocus();
+    setResizeDir(dir);
+    resizeStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      width: size.width,
+      height: size.height,
+      left: position.x,
+      top: position.y,
+    };
+  }, [isMaximized, onFocus, size, position]);
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
-      
-      const newX = e.clientX - dragStart.current.x;
-      const newY = e.clientY - dragStart.current.y;
-      const constrained = constrainPosition(newX, newY, size);
-      
-      setPosition(constrained);
+      if (isDragging) {
+        const newX = e.clientX - dragStart.current.x;
+        const newY = e.clientY - dragStart.current.y;
+        const constrained = constrainPosition(newX, newY, size);
+        setPosition(constrained);
+        return;
+      }
+
+      if (resizeDir) {
+        const dx = e.clientX - resizeStart.current.x;
+        const dy = e.clientY - resizeStart.current.y;
+        let { width, height, left, top } = resizeStart.current;
+
+        if (resizeDir.includes('e')) {
+          width = Math.max(MIN_WIDTH, resizeStart.current.width + dx);
+        }
+        if (resizeDir.includes('s')) {
+          height = Math.max(MIN_HEIGHT, resizeStart.current.height + dy);
+        }
+        if (resizeDir.includes('w')) {
+          const proposedWidth = resizeStart.current.width - dx;
+          width = Math.max(MIN_WIDTH, proposedWidth);
+          left = resizeStart.current.left + (resizeStart.current.width - width);
+        }
+        if (resizeDir.includes('n')) {
+          const proposedHeight = resizeStart.current.height - dy;
+          height = Math.max(MIN_HEIGHT, proposedHeight);
+          top = resizeStart.current.top + (resizeStart.current.height - height);
+        }
+
+        // Keep top from going above the visible area
+        top = Math.max(0, top);
+
+        setSize({ width, height });
+        setPosition({ x: left, y: top });
+      }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -137,13 +200,14 @@ export default function Window({
 
     const handleMouseUp = () => {
       setIsDragging(false);
+      setResizeDir(null);
     };
 
     const handleTouchEnd = () => {
       setIsDragging(false);
     };
 
-    if (isDragging) {
+    if (isDragging || resizeDir) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
       document.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -156,7 +220,7 @@ export default function Window({
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [isDragging, constrainPosition, size]);
+  }, [isDragging, resizeDir, constrainPosition, size]);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -185,6 +249,20 @@ export default function Window({
   };
 
   if (isMinimized) return null;
+
+  const edgeThickness = 5;
+  const cornerSize = 9;
+
+  const resizeHandles: { dir: ResizeDir; style: React.CSSProperties }[] = [
+    { dir: 'n', style: { top: -edgeThickness / 2, left: cornerSize, right: cornerSize, height: edgeThickness } },
+    { dir: 's', style: { bottom: -edgeThickness / 2, left: cornerSize, right: cornerSize, height: edgeThickness } },
+    { dir: 'e', style: { right: -edgeThickness / 2, top: cornerSize, bottom: cornerSize, width: edgeThickness } },
+    { dir: 'w', style: { left: -edgeThickness / 2, top: cornerSize, bottom: cornerSize, width: edgeThickness } },
+    { dir: 'ne', style: { top: -cornerSize / 2, right: -cornerSize / 2, width: cornerSize, height: cornerSize } },
+    { dir: 'nw', style: { top: -cornerSize / 2, left: -cornerSize / 2, width: cornerSize, height: cornerSize } },
+    { dir: 'se', style: { bottom: -cornerSize / 2, right: -cornerSize / 2, width: cornerSize, height: cornerSize } },
+    { dir: 'sw', style: { bottom: -cornerSize / 2, left: -cornerSize / 2, width: cornerSize, height: cornerSize } },
+  ];
 
   return (
     <div
@@ -258,6 +336,19 @@ export default function Window({
       <div className="xp-window-content">
         {children}
       </div>
+
+      {!isMaximized && resizeHandles.map(({ dir, style }) => (
+        <div
+          key={dir}
+          onMouseDown={handleResizeStart(dir)}
+          style={{
+            position: 'absolute',
+            zIndex: 5,
+            cursor: RESIZE_CURSORS[dir],
+            ...style,
+          }}
+        />
+      ))}
     </div>
   );
 }

@@ -9,6 +9,7 @@ interface DesktopIconProps {
   onClick: (e: MouseEvent) => void;
   onDoubleClick: () => void;
   onContextMenu?: (e: MouseEvent) => void;
+  onMouseDown?: (e: MouseEvent) => void;
 }
 
 export default function DesktopIcon({ 
@@ -18,6 +19,7 @@ export default function DesktopIcon({
   onClick, 
   onDoubleClick,
   onContextMenu,
+  onMouseDown,
 }: DesktopIconProps) {
   return (
     <div
@@ -25,6 +27,7 @@ export default function DesktopIcon({
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
+      onMouseDown={onMouseDown}
     >
       <div className="xp-desktop-icon-image">{icon}</div>
       <span className="xp-desktop-icon-label">{label}</span>

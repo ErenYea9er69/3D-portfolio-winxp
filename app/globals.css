@@ -379,6 +379,29 @@ html, body {
   margin: 0 2px;
 }
 
+.xp-quicklaunch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 22px;
+  margin: 0 3px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.xp-quicklaunch-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.xp-quicklaunch-btn:active {
+  background: rgba(0, 0, 0, 0.15);
+}
+
 .xp-taskbar-item {
   background: linear-gradient(180deg, 
     #3a8dea 0%,

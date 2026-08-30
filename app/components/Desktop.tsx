@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Window from './Window';
 import Taskbar from './Taskbar';
 import StartMenu from './StartMenu';
@@ -20,7 +20,7 @@ import RecycleBinContent from './windows/RecycleBinContent';
 import SolitaireContent from './windows/SolitaireContent';
 import PaintContent from './windows/PaintContent';
 import SnakeContent from './windows/SnakeContent';
-import ContextMenu from './ContextMenu';
+import ContextMenu, { MenuItem } from './ContextMenu';
 
 interface ShutdownDialogProps {
   onCancel: () => void;
@@ -324,6 +324,22 @@ const menuItems = [
   { id: 'minesweeper', title: 'Minesweeper', icon: '💣' },
 ];
 
+// Grid geometry used for the free-drag / align-to-grid math.
+// Matches the CSS grid used when Auto Arrange is on: 75px cells + 4px gap,
+// starting at (10, 10) from the desktop's top-left corner.
+const GRID_CELL_W = 79;
+const GRID_CELL_H = 84;
+const GRID_ORIGIN = { x: 10, y: 10 };
+
+function snapToGrid(x: number, y: number) {
+  const col = Math.round((x - GRID_ORIGIN.x) / GRID_CELL_W);
+  const row = Math.round((y - GRID_ORIGIN.y) / GRID_CELL_H);
+  return {
+    x: GRID_ORIGIN.x + Math.max(0, col) * GRID_CELL_W,
+    y: GRID_ORIGIN.y + Math.max(0, row) * GRID_CELL_H,
+  };
+}
+
 interface DesktopProps {
   onLogOff: () => void;
 }
@@ -331,18 +347,34 @@ interface DesktopProps {
 export default function Desktop({ onLogOff }: DesktopProps) {
   const [windows, setWindows] = useState<WindowState[]>(initialWindows);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
-  const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+  const [selectedIcons, setSelectedIcons] = useState<Set<string>>(new Set());
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
   const [highestZIndex, setHighestZIndex] = useState(1);
   const [showShutdownDialog, setShowShutdownDialog] = useState(false);
   const [shutdownState, setShutdownState] = useState<'none' | 'shuttingdown' | 'restarting'>('none');
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; type: 'desktop' | 'icon'; iconId?: string } | null>(null);
 
+  // Icon arrangement state
+  const [autoArrange, setAutoArrange] = useState(true);
+  const [alignToGrid, setAlignToGrid] = useState(true);
+  const [freePositions, setFreePositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [draggingIcon, setDraggingIcon] = useState<string | null>(null);
+  const dragOffset = useRef({ x: 0, y: 0 });
+
+  // Rubber-band selection
+  const [marquee, setMarquee] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
+  const marqueeStart = useRef<{ x: number; y: number } | null>(null);
+  const desktopAreaRef = useRef<HTMLDivElement>(null);
+  const iconRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Restore-all state for the Show Desktop toggle
+  const preShowDesktopMinimized = useRef<Set<string>>(new Set());
+  const [isShowingDesktop, setIsShowingDesktop] = useState(false);
+
   const handleShutdown = useCallback(() => {
     setShowShutdownDialog(false);
     setShutdownState('shuttingdown');
     setTimeout(() => {
-      // Clear session storage and show "It's safe to turn off" or just black screen
       sessionStorage.removeItem('xp-booted');
       window.location.reload();
     }, 2000);
@@ -407,25 +439,52 @@ export default function Desktop({ onLogOff }: DesktopProps) {
     setActiveWindowId(id);
   }, [highestZIndex]);
 
+  const restoreWindow = useCallback((id: string) => {
+    setHighestZIndex(prev => prev + 1);
+    setWindows(prev => prev.map(w =>
+      w.id === id ? { ...w, isMinimized: false, zIndex: highestZIndex + 1 } : w
+    ));
+    setActiveWindowId(id);
+  }, [highestZIndex]);
+
   const handleTaskbarWindowClick = useCallback((id: string) => {
     const window = windows.find(w => w.id === id);
     if (!window) return;
 
     if (window.isMinimized) {
-      setHighestZIndex(prev => prev + 1);
-      setWindows(prev => prev.map(w => 
-        w.id === id ? { ...w, isMinimized: false, zIndex: highestZIndex + 1 } : w
-      ));
-      setActiveWindowId(id);
+      restoreWindow(id);
     } else if (activeWindowId === id) {
       minimizeWindow(id);
     } else {
       focusWindow(id);
     }
-  }, [windows, activeWindowId, highestZIndex, minimizeWindow, focusWindow]);
+  }, [windows, activeWindowId, restoreWindow, minimizeWindow, focusWindow]);
+
+  const handleWindowAction = useCallback((id: string, action: 'restore' | 'minimize' | 'close') => {
+    if (action === 'restore') restoreWindow(id);
+    else if (action === 'minimize') minimizeWindow(id);
+    else closeWindow(id);
+  }, [restoreWindow, minimizeWindow, closeWindow]);
+
+  const handleShowDesktop = useCallback(() => {
+    if (isShowingDesktop) {
+      // Restore whichever windows we minimized
+      setWindows(prev => prev.map(w =>
+        preShowDesktopMinimized.current.has(w.id) ? { ...w, isMinimized: false } : w
+      ));
+      setIsShowingDesktop(false);
+    } else {
+      const toMinimize = windows.filter(w => w.isOpen && !w.isMinimized).map(w => w.id);
+      preShowDesktopMinimized.current = new Set(toMinimize);
+      setWindows(prev => prev.map(w =>
+        toMinimize.includes(w.id) ? { ...w, isMinimized: true } : w
+      ));
+      setIsShowingDesktop(true);
+    }
+  }, [isShowingDesktop, windows]);
 
   const handleDesktopClick = () => {
-    setSelectedIcon(null);
+    setSelectedIcons(new Set());
     setIsStartMenuOpen(false);
     setContextMenu(null);
   };
@@ -437,20 +496,206 @@ export default function Desktop({ onLogOff }: DesktopProps) {
     setIsStartMenuOpen(false);
   };
 
-  const getDesktopContextMenuItems = () => [
-    { label: 'View', icon: '👁️', disabled: true },
-    { label: 'Sort By', icon: '📊', disabled: true },
+  // ---- Icon selection helpers ----
+  const selectOnly = (id: string) => setSelectedIcons(new Set([id]));
+  const toggleSelect = (id: string) => {
+    setSelectedIcons(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // ---- Rubber-band marquee selection ----
+  const handleDesktopMouseDown = (e: React.MouseEvent) => {
+    // Only start marquee on a plain left-click on empty desktop space
+    if (e.button !== 0) return;
+    if ((e.target as HTMLElement).closest('.xp-desktop-icon')) return;
+
+    const rect = desktopAreaRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    marqueeStart.current = { x, y };
+    setMarquee({ x0: x, y0: y, x1: x, y1: y });
+  };
+
+  useEffect(() => {
+    if (!marquee) return;
+
+    const handleMove = (e: MouseEvent) => {
+      const rect = desktopAreaRef.current?.getBoundingClientRect();
+      if (!rect || !marqueeStart.current) return;
+      const x1 = e.clientX - rect.left;
+      const y1 = e.clientY - rect.top;
+      const box = {
+        x0: marqueeStart.current.x,
+        y0: marqueeStart.current.y,
+        x1,
+        y1,
+      };
+      setMarquee(box);
+
+      const left = Math.min(box.x0, box.x1);
+      const right = Math.max(box.x0, box.x1);
+      const top = Math.min(box.y0, box.y1);
+      const bottom = Math.max(box.y0, box.y1);
+
+      const next = new Set<string>();
+      Object.entries(iconRefs.current).forEach(([id, el]) => {
+        if (!el || !desktopAreaRef.current) return;
+        const desktopRect = desktopAreaRef.current.getBoundingClientRect();
+        const r = el.getBoundingClientRect();
+        const iconLeft = r.left - desktopRect.left;
+        const iconTop = r.top - desktopRect.top;
+        const iconRight = iconLeft + r.width;
+        const iconBottom = iconTop + r.height;
+        const intersects = iconLeft < right && iconRight > left && iconTop < bottom && iconBottom > top;
+        if (intersects) next.add(id);
+      });
+      setSelectedIcons(next);
+    };
+
+    const handleUp = () => {
+      setMarquee(null);
+      marqueeStart.current = null;
+    };
+
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+    };
+  }, [marquee]);
+
+  // ---- Free-drag icon dragging ----
+  const beginIconDrag = (id: string) => (e: React.MouseEvent) => {
+    if (autoArrange) return; // icons are locked in the grid
+    if (e.button !== 0) return;
+    e.stopPropagation();
+
+    if (!selectedIcons.has(id)) selectOnly(id);
+
+    const el = iconRefs.current[id];
+    const rect = el?.getBoundingClientRect();
+    if (!rect) return;
+    dragOffset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    setDraggingIcon(id);
+  };
+
+  useEffect(() => {
+    if (!draggingIcon) return;
+
+    const handleMove = (e: MouseEvent) => {
+      const desktopRect = desktopAreaRef.current?.getBoundingClientRect();
+      if (!desktopRect) return;
+      const x = e.clientX - desktopRect.left - dragOffset.current.x;
+      const y = e.clientY - desktopRect.top - dragOffset.current.y;
+      setFreePositions(prev => ({ ...prev, [draggingIcon]: { x: Math.max(0, x), y: Math.max(0, y) } }));
+    };
+
+    const handleUp = () => {
+      setFreePositions(prev => {
+        const pos = prev[draggingIcon];
+        if (!pos || !alignToGrid) return prev;
+        return { ...prev, [draggingIcon]: snapToGrid(pos.x, pos.y) };
+      });
+      setDraggingIcon(null);
+    };
+
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+    };
+  }, [draggingIcon, alignToGrid]);
+
+  // Capture current on-screen positions when Auto Arrange is switched off,
+  // so icons don't jump when they become freely draggable.
+  const disableAutoArrange = () => {
+    const captured: Record<string, { x: number; y: number }> = {};
+    desktopIcons.forEach(({ id }) => {
+      const el = iconRefs.current[id];
+      const desktopRect = desktopAreaRef.current?.getBoundingClientRect();
+      if (!el || !desktopRect) return;
+      const r = el.getBoundingClientRect();
+      captured[id] = { x: r.left - desktopRect.left, y: r.top - desktopRect.top };
+    });
+    setFreePositions(prev => ({ ...prev, ...captured }));
+    setAutoArrange(false);
+  };
+
+  const sortIconsByName = () => {
+    const sorted = [...desktopIcons].sort((a, b) => a.label.localeCompare(b.label));
+    const positions: Record<string, { x: number; y: number }> = {};
+    const rowsPerColumn = 8;
+    sorted.forEach((icon, i) => {
+      const col = Math.floor(i / rowsPerColumn);
+      const row = i % rowsPerColumn;
+      positions[icon.id] = {
+        x: GRID_ORIGIN.x + col * GRID_CELL_W,
+        y: GRID_ORIGIN.y + row * GRID_CELL_H,
+      };
+    });
+    setFreePositions(positions);
+    setAutoArrange(false);
+  };
+
+  const getDesktopContextMenuItems = (): MenuItem[] => [
+    {
+      label: 'View',
+      icon: '👁️',
+      submenu: [
+        { label: 'Large Icons', checked: true },
+        { label: 'Tiles', disabled: true },
+        { label: 'Icons', disabled: true },
+        { label: 'List', disabled: true },
+        { divider: true },
+        { label: 'Arrange Icons Automatically', checked: autoArrange, onClick: () => setAutoArrange(true) },
+      ],
+    },
+    {
+      label: 'Arrange Icons By',
+      icon: '📊',
+      submenu: [
+        { label: 'Name', onClick: sortIconsByName },
+        { label: 'Type', disabled: true },
+        { label: 'Size', disabled: true },
+        { divider: true },
+        {
+          label: 'Auto Arrange',
+          checked: autoArrange,
+          onClick: () => (autoArrange ? disableAutoArrange() : setAutoArrange(true)),
+        },
+        {
+          label: 'Align to Grid',
+          checked: alignToGrid,
+          onClick: () => setAlignToGrid(v => !v),
+        },
+      ],
+    },
     { label: 'Refresh', icon: '🔄', onClick: () => window.location.reload() },
     { divider: true },
     { label: 'Paste', icon: '📋', disabled: true },
     { label: 'Paste Shortcut', disabled: true },
     { divider: true },
-    { label: 'New', icon: '📄', disabled: true },
+    {
+      label: 'New',
+      icon: '📄',
+      submenu: [
+        { label: 'Folder', disabled: true },
+        { label: 'Shortcut', disabled: true },
+        { label: 'Text Document', disabled: true },
+      ],
+    },
     { divider: true },
     { label: 'Properties', icon: '⚙️', onClick: () => openWindow('mycomputer') },
   ];
 
-  const getIconContextMenuItems = (iconId: string) => [
+  const getIconContextMenuItems = (iconId: string): MenuItem[] => [
     { label: 'Open', icon: '📂', onClick: () => openWindow(iconId) },
     { divider: true },
     { label: 'Cut', icon: '✂️', disabled: true },
@@ -521,6 +766,7 @@ export default function Desktop({ onLogOff }: DesktopProps) {
     >
       {/* Desktop Area - Windows XP Bliss Wallpaper */}
       <div 
+        ref={desktopAreaRef}
         style={{
           flex: 1,
           position: 'relative',
@@ -531,46 +777,99 @@ export default function Desktop({ onLogOff }: DesktopProps) {
           backgroundRepeat: 'no-repeat',
         }}
         onClick={handleDesktopClick}
+        onMouseDown={handleDesktopMouseDown}
         onContextMenu={(e) => handleContextMenu(e, 'desktop')}
       >
-        {/* Desktop Icons - Grid Layout */}
-        <div 
-          className="xp-desktop-icons"
-          style={{
-            position: 'absolute',
-            top: '10px',
-            left: '10px',
-            bottom: '10px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, 75px)',
-            gridTemplateRows: 'repeat(auto-fill, 80px)',
-            gridAutoFlow: 'column',
-            gap: '4px',
-            alignContent: 'start',
-            width: '160px',
-          }}
-        >
-          {desktopIcons.map(iconData => (
-            <DesktopIcon
-              key={iconData.id}
-              icon={iconData.icon}
-              label={iconData.label}
-              isSelected={selectedIcon === iconData.id}
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedIcon(iconData.id);
-                setContextMenu(null);
-              }}
-              onDoubleClick={() => openWindow(iconData.id)}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setSelectedIcon(iconData.id);
-                handleContextMenu(e, 'icon', iconData.id);
-              }}
-            />
-          ))}
-        </div>
+        {/* Desktop Icons */}
+        {autoArrange ? (
+          <div 
+            className="xp-desktop-icons"
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              bottom: '10px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, 75px)',
+              gridTemplateRows: 'repeat(auto-fill, 80px)',
+              gridAutoFlow: 'column',
+              gap: '4px',
+              alignContent: 'start',
+              width: '160px',
+            }}
+          >
+            {desktopIcons.map(iconData => (
+              <div key={iconData.id} ref={(el) => { iconRefs.current[iconData.id] = el; }}>
+                <DesktopIcon
+                  icon={iconData.icon}
+                  label={iconData.label}
+                  isSelected={selectedIcons.has(iconData.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (e.ctrlKey || e.metaKey) toggleSelect(iconData.id);
+                    else selectOnly(iconData.id);
+                    setContextMenu(null);
+                  }}
+                  onDoubleClick={() => openWindow(iconData.id)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!selectedIcons.has(iconData.id)) selectOnly(iconData.id);
+                    handleContextMenu(e, 'icon', iconData.id);
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          desktopIcons.map(iconData => {
+            const pos = freePositions[iconData.id] || GRID_ORIGIN;
+            return (
+              <div
+                key={iconData.id}
+                ref={(el) => { iconRefs.current[iconData.id] = el; }}
+                style={{ position: 'absolute', left: pos.x, top: pos.y }}
+              >
+                <DesktopIcon
+                  icon={iconData.icon}
+                  label={iconData.label}
+                  isSelected={selectedIcons.has(iconData.id)}
+                  onMouseDown={beginIconDrag(iconData.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (e.ctrlKey || e.metaKey) toggleSelect(iconData.id);
+                    else selectOnly(iconData.id);
+                    setContextMenu(null);
+                  }}
+                  onDoubleClick={() => openWindow(iconData.id)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!selectedIcons.has(iconData.id)) selectOnly(iconData.id);
+                    handleContextMenu(e, 'icon', iconData.id);
+                  }}
+                />
+              </div>
+            );
+          })
+        )}
+
+        {/* Rubber-band selection box */}
+        {marquee && (
+          <div
+            style={{
+              position: 'absolute',
+              left: Math.min(marquee.x0, marquee.x1),
+              top: Math.min(marquee.y0, marquee.y1),
+              width: Math.abs(marquee.x1 - marquee.x0),
+              height: Math.abs(marquee.y1 - marquee.y0),
+              background: 'rgba(49, 106, 197, 0.25)',
+              border: '1px solid rgba(49, 106, 197, 0.9)',
+              pointerEvents: 'none',
+              zIndex: 5,
+            }}
+          />
+        )}
 
         {/* Recycle Bin at bottom right - fixed position */}
         <div
@@ -584,17 +883,18 @@ export default function Desktop({ onLogOff }: DesktopProps) {
           <DesktopIcon
             icon="🗑️"
             label="Recycle Bin"
-            isSelected={selectedIcon === 'recycle'}
+            isSelected={selectedIcons.has('recycle')}
             onClick={(e) => {
               e.stopPropagation();
-              setSelectedIcon('recycle');
+              if (e.ctrlKey || e.metaKey) toggleSelect('recycle');
+              else selectOnly('recycle');
               setContextMenu(null);
             }}
             onDoubleClick={() => openWindow('recycle')}
             onContextMenu={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setSelectedIcon('recycle');
+              selectOnly('recycle');
               handleContextMenu(e, 'icon', 'recycle');
             }}
           />
@@ -671,8 +971,10 @@ export default function Desktop({ onLogOff }: DesktopProps) {
         }))}
         activeWindowId={activeWindowId}
         onWindowClick={handleTaskbarWindowClick}
+        onWindowAction={handleWindowAction}
         onStartClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
         isStartMenuOpen={isStartMenuOpen}
+        onShowDesktop={handleShowDesktop}
       />
     </div>
   );
