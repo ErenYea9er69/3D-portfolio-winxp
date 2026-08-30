@@ -20,7 +20,7 @@ import RecycleBinContent from './windows/RecycleBinContent';
 import SolitaireContent from './windows/SolitaireContent';
 import PaintContent from './windows/PaintContent';
 import SnakeContent from './windows/SnakeContent';
-import BrainrotContent from './windows/BrainrotContent';
+
 import DisplayPropertiesContent, { WallpaperOption } from './windows/DisplayPropertiesContent';
 import FolderContent from './windows/FolderContent';
 import ContextMenu, { MenuItem } from './ContextMenu';
@@ -335,16 +335,7 @@ const initialWindows: WindowState[] = [
     position: { x: 200, y: 60 },
     size: { width: 360, height: 420 },
   },
-  {
-    id: 'brainrot',
-    title: 'BrainRot.exe',
-    icon: '💀',
-    isOpen: false,
-    isMinimized: false,
-    zIndex: 1,
-    position: { x: 260, y: 30 },
-    size: { width: 340, height: 520 },
-  },
+
   {
     id: 'dispprops',
     title: 'Display Properties',
@@ -372,7 +363,7 @@ const desktopIcons = [
   { id: 'snake', icon: '🐍', label: 'Snake' },
   { id: 'help', icon: '❓', label: 'Help' },
   { id: 'recycle', icon: '🗑️', label: 'Recycle Bin' },
-  { id: 'brainrot', icon: '💀', label: 'BrainRot.exe' },
+
 ];
 
 const menuItems = [
@@ -386,7 +377,7 @@ const menuItems = [
   { id: 'notepad', title: 'Notepad', icon: '📝' },
   { id: 'calculator', title: 'Calculator', icon: '🔢' },
   { id: 'minesweeper', title: 'Minesweeper', icon: '💣' },
-  { id: 'brainrot', title: 'BrainRot.exe', icon: '💀' },
+
 ];
 
 // Grid geometry used for the free-drag / align-to-grid math.
@@ -866,8 +857,7 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
         return <PaintContent />;
       case 'snake':
         return <SnakeContent />;
-      case 'brainrot':
-        return <BrainrotContent />;
+
       case 'dispprops':
         return (
           <DisplayPropertiesContent
