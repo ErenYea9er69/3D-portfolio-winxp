@@ -271,7 +271,14 @@ function SleepScreen({ onWakeUp }: { onWakeUp: () => void }) {
           e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
         }}
       >
-        ⏻ Wake Up
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <img 
+            src="/bye.gif" 
+            alt="Wake up icon" 
+            style={{ width: '20px', height: '20px', objectFit: 'contain' }} 
+          />
+          Wake Up
+        </div>
       </button>
 
       <div style={{
