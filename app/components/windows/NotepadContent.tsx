@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 
-export default function NotepadContent() {
-  const [text, setText] = useState(`Welcome to Notepad!
+interface NotepadContentProps {
+  initialText?: string;
+}
+
+export default function NotepadContent({ initialText }: NotepadContentProps) {
+  const [text, setText] = useState(initialText ?? `Welcome to Notepad!
   
 This is a simple text editor, just like the classic Windows XP Notepad.
 

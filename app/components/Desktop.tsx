@@ -20,7 +20,49 @@ import RecycleBinContent from './windows/RecycleBinContent';
 import SolitaireContent from './windows/SolitaireContent';
 import PaintContent from './windows/PaintContent';
 import SnakeContent from './windows/SnakeContent';
+import BrainrotContent from './windows/BrainrotContent';
+import DisplayPropertiesContent, { WallpaperOption } from './windows/DisplayPropertiesContent';
+import FolderContent from './windows/FolderContent';
 import ContextMenu, { MenuItem } from './ContextMenu';
+
+const WALLPAPERS: WallpaperOption[] = [
+  {
+    id: 'bliss',
+    label: 'Bliss (Default)',
+    css: 'url(/windows_xp_original-wallpaper-1920x1080.jpg) center/cover no-repeat',
+    swatch: 'linear-gradient(180deg, #5fa8e0 0%, #74b843 60%, #3f8f2a 100%)',
+  },
+  {
+    id: 'azul',
+    label: 'Azul',
+    css: 'linear-gradient(160deg, #0a3d91 0%, #1465c7 40%, #2f8fe0 70%, #7ec8f5 100%)',
+    swatch: 'linear-gradient(160deg, #0a3d91 0%, #7ec8f5 100%)',
+  },
+  {
+    id: 'autumn',
+    label: 'Autumn',
+    css: 'linear-gradient(160deg, #3c2a14 0%, #7a4a1e 45%, #c07830 75%, #e7a94d 100%)',
+    swatch: 'linear-gradient(160deg, #3c2a14 0%, #e7a94d 100%)',
+  },
+  {
+    id: 'redmoon',
+    label: 'Red Moon Desert',
+    css: 'linear-gradient(160deg, #200a0a 0%, #5c1414 45%, #9c2b1f 75%, #d97a3d 100%)',
+    swatch: 'linear-gradient(160deg, #200a0a 0%, #d97a3d 100%)',
+  },
+  {
+    id: 'classic',
+    label: 'Windows Classic',
+    css: '#008080',
+    swatch: '#008080',
+  },
+  {
+    id: 'none',
+    label: 'None (Solid Navy)',
+    css: '#003399',
+    swatch: '#003399',
+  },
+];
 
 interface ShutdownDialogProps {
   onCancel: () => void;
@@ -293,6 +335,26 @@ const initialWindows: WindowState[] = [
     position: { x: 200, y: 60 },
     size: { width: 360, height: 420 },
   },
+  {
+    id: 'brainrot',
+    title: 'BrainRot.exe',
+    icon: '💀',
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 1,
+    position: { x: 260, y: 30 },
+    size: { width: 340, height: 520 },
+  },
+  {
+    id: 'dispprops',
+    title: 'Display Properties',
+    icon: '🖼️',
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 1,
+    position: { x: 220, y: 90 },
+    size: { width: 460, height: 420 },
+  },
 ];
 
 const desktopIcons = [
@@ -310,6 +372,7 @@ const desktopIcons = [
   { id: 'snake', icon: '🐍', label: 'Snake' },
   { id: 'help', icon: '❓', label: 'Help' },
   { id: 'recycle', icon: '🗑️', label: 'Recycle Bin' },
+  { id: 'brainrot', icon: '💀', label: 'BrainRot.exe' },
 ];
 
 const menuItems = [
@@ -323,6 +386,7 @@ const menuItems = [
   { id: 'notepad', title: 'Notepad', icon: '📝' },
   { id: 'calculator', title: 'Calculator', icon: '🔢' },
   { id: 'minesweeper', title: 'Minesweeper', icon: '💣' },
+  { id: 'brainrot', title: 'BrainRot.exe', icon: '💀' },
 ];
 
 // Grid geometry used for the free-drag / align-to-grid math.
@@ -354,6 +418,15 @@ export default function Desktop({ onLogOff }: DesktopProps) {
   const [showShutdownDialog, setShowShutdownDialog] = useState(false);
   const [shutdownState, setShutdownState] = useState<'none' | 'shuttingdown' | 'restarting'>('none');
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; type: 'desktop' | 'icon'; iconId?: string } | null>(null);
+
+  // Desktop background / Display Properties
+  const [wallpaper, setWallpaper] = useState('bliss');
+
+  // User-created desktop items (New > Folder / New > Text Document)
+  interface CustomIcon { id: string; icon: string; label: string; kind: 'folder' | 'textfile' }
+  const [customIcons, setCustomIcons] = useState<CustomIcon[]>([]);
+  const newItemCounter = useRef({ folder: 0, textfile: 0 });
+  const allDesktopIcons = [...desktopIcons, ...customIcons];
 
   // Icon arrangement state
   const [autoArrange, setAutoArrange] = useState(true);
@@ -397,14 +470,33 @@ export default function Desktop({ onLogOff }: DesktopProps) {
 
   const openWindow = useCallback((id: string) => {
     setHighestZIndex(prev => prev + 1);
-    setWindows(prev => prev.map(w => 
-      w.id === id 
-        ? { ...w, isOpen: true, isMinimized: false, zIndex: highestZIndex + 1 }
-        : w
-    ));
+    setWindows(prev => {
+      const exists = prev.some(w => w.id === id);
+      if (exists) {
+        return prev.map(w =>
+          w.id === id
+            ? { ...w, isOpen: true, isMinimized: false, zIndex: highestZIndex + 1 }
+            : w
+        );
+      }
+      // Dynamically-created window, e.g. a user-made desktop folder / text file
+      const custom = customIcons.find(c => c.id === id);
+      if (!custom) return prev;
+      const newWindow: WindowState = {
+        id: custom.id,
+        title: custom.kind === 'folder' ? custom.label : `${custom.label} - Notepad`,
+        icon: custom.icon,
+        isOpen: true,
+        isMinimized: false,
+        zIndex: highestZIndex + 1,
+        position: { x: 220, y: 100 },
+        size: custom.kind === 'folder' ? { width: 420, height: 380 } : { width: 420, height: 340 },
+      };
+      return [...prev, newWindow];
+    });
     setActiveWindowId(id);
     setIsStartMenuOpen(false);
-  }, [highestZIndex]);
+  }, [highestZIndex, customIcons]);
 
   const closeWindow = useCallback((id: string) => {
     setWindows(prev => prev.map(w => 
@@ -618,7 +710,7 @@ export default function Desktop({ onLogOff }: DesktopProps) {
   // so icons don't jump when they become freely draggable.
   const disableAutoArrange = () => {
     const captured: Record<string, { x: number; y: number }> = {};
-    desktopIcons.forEach(({ id }) => {
+    allDesktopIcons.forEach(({ id }) => {
       const el = iconRefs.current[id];
       const desktopRect = desktopAreaRef.current?.getBoundingClientRect();
       if (!el || !desktopRect) return;
@@ -629,8 +721,31 @@ export default function Desktop({ onLogOff }: DesktopProps) {
     setAutoArrange(false);
   };
 
+  const createNewItem = (kind: 'folder' | 'textfile') => {
+    newItemCounter.current[kind] += 1;
+    const n = newItemCounter.current[kind];
+    const base = kind === 'folder' ? 'New Folder' : 'New Text Document';
+    const label = n === 1 ? (kind === 'folder' ? base : `${base}.txt`) : (kind === 'folder' ? `${base} (${n})` : `${base} (${n}).txt`);
+    const id = `custom-${kind}-${Date.now()}`;
+    const icon = kind === 'folder' ? '📁' : '📝';
+    setCustomIcons(prev => [...prev, { id, icon, label, kind }]);
+    selectOnly(id);
+    setContextMenu(null);
+  };
+
+  const deleteCustomIcon = (id: string) => {
+    setCustomIcons(prev => prev.filter(c => c.id !== id));
+    setWindows(prev => prev.filter(w => w.id !== id));
+    setSelectedIcons(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    setContextMenu(null);
+  };
+
   const sortIconsByName = () => {
-    const sorted = [...desktopIcons].sort((a, b) => a.label.localeCompare(b.label));
+    const sorted = [...allDesktopIcons].sort((a, b) => a.label.localeCompare(b.label));
     const positions: Record<string, { x: number; y: number }> = {};
     const rowsPerColumn = 8;
     sorted.forEach((icon, i) => {
@@ -687,27 +802,30 @@ export default function Desktop({ onLogOff }: DesktopProps) {
       label: 'New',
       icon: '📄',
       submenu: [
-        { label: 'Folder', disabled: true },
+        { label: 'Folder', icon: '📁', onClick: () => createNewItem('folder') },
         { label: 'Shortcut', disabled: true },
-        { label: 'Text Document', disabled: true },
+        { label: 'Text Document', icon: '📝', onClick: () => createNewItem('textfile') },
       ],
     },
     { divider: true },
-    { label: 'Properties', icon: '⚙️', onClick: () => openWindow('mycomputer') },
+    { label: 'Properties', icon: '🖼️', onClick: () => openWindow('dispprops') },
   ];
 
-  const getIconContextMenuItems = (iconId: string): MenuItem[] => [
-    { label: 'Open', icon: '📂', onClick: () => openWindow(iconId) },
-    { divider: true },
-    { label: 'Cut', icon: '✂️', disabled: true },
-    { label: 'Copy', icon: '📋', disabled: true },
-    { divider: true },
-    { label: 'Create Shortcut', disabled: true },
-    { label: 'Delete', icon: '🗑️', disabled: true },
-    { label: 'Rename', disabled: true },
-    { divider: true },
-    { label: 'Properties', icon: '⚙️', onClick: () => openWindow(iconId) },
-  ];
+  const getIconContextMenuItems = (iconId: string): MenuItem[] => {
+    const isCustom = customIcons.some(c => c.id === iconId);
+    return [
+      { label: 'Open', icon: '📂', onClick: () => openWindow(iconId) },
+      { divider: true },
+      { label: 'Cut', icon: '✂️', disabled: true },
+      { label: 'Copy', icon: '📋', disabled: true },
+      { divider: true },
+      { label: 'Create Shortcut', disabled: true },
+      { label: 'Delete', icon: '🗑️', disabled: !isCustom, onClick: isCustom ? () => deleteCustomIcon(iconId) : undefined },
+      { label: 'Rename', disabled: true },
+      { divider: true },
+      { label: 'Properties', icon: '⚙️', onClick: () => openWindow(iconId) },
+    ];
+  };
 
   const handleRunCommand = useCallback((appId: string) => {
     if (appId) {
@@ -748,8 +866,22 @@ export default function Desktop({ onLogOff }: DesktopProps) {
         return <PaintContent />;
       case 'snake':
         return <SnakeContent />;
-      default:
+      case 'brainrot':
+        return <BrainrotContent />;
+      case 'dispprops':
+        return (
+          <DisplayPropertiesContent
+            wallpapers={WALLPAPERS}
+            currentWallpaper={wallpaper}
+            onApply={(wallpaperId) => setWallpaper(wallpaperId)}
+          />
+        );
+      default: {
+        const custom = customIcons.find(c => c.id === id);
+        if (custom?.kind === 'folder') return <FolderContent name={custom.label} />;
+        if (custom?.kind === 'textfile') return <NotepadContent initialText="" />;
         return null;
+      }
     }
   };
 
@@ -772,10 +904,7 @@ export default function Desktop({ onLogOff }: DesktopProps) {
           flex: 1,
           position: 'relative',
           overflow: 'hidden',
-          backgroundImage: 'url(/windows_xp_original-wallpaper-1920x1080.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+          background: WALLPAPERS.find(w => w.id === wallpaper)?.css ?? WALLPAPERS[0].css,
         }}
         onClick={handleDesktopClick}
         onMouseDown={handleDesktopMouseDown}
@@ -798,7 +927,7 @@ export default function Desktop({ onLogOff }: DesktopProps) {
               alignContent: 'start',
             }}
           >
-            {desktopIcons.map(iconData => (
+            {allDesktopIcons.map(iconData => (
               <div key={iconData.id} ref={(el) => { iconRefs.current[iconData.id] = el; }}>
                 <DesktopIcon
                   icon={iconData.icon}
@@ -822,7 +951,7 @@ export default function Desktop({ onLogOff }: DesktopProps) {
             ))}
           </div>
         ) : (
-          desktopIcons.map(iconData => {
+          allDesktopIcons.map(iconData => {
             const pos = freePositions[iconData.id] || GRID_ORIGIN;
             return (
               <div
