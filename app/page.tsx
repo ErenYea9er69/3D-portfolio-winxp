@@ -145,8 +145,104 @@ function WelcomeScreen({ onLogin }: { onLogin: () => void }) {
   );
 }
 
+// Sleep Screen - shows sleep.gif with a wake-up button
+function SleepScreen({ onWakeUp }: { onWakeUp: () => void }) {
+  const [showButton, setShowButton] = useState(false);
+
+  useEffect(() => {
+    // Show the wake-up button after a brief delay so the transition feels natural
+    const timer = setTimeout(() => setShowButton(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      background: '#000',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 99999,
+      cursor: 'default',
+    }}>
+      {/* Sleep GIF */}
+      <img
+        src="/sleep.gif"
+        alt="Computer sleeping"
+        style={{
+          maxWidth: '320px',
+          maxHeight: '320px',
+          objectFit: 'contain',
+          marginBottom: '40px',
+          opacity: 1,
+          animation: 'sleepFadeIn 1s ease-out',
+        }}
+      />
+
+      {/* Wake Up Button */}
+      <button
+        onClick={onWakeUp}
+        style={{
+          opacity: showButton ? 1 : 0,
+          transform: showButton ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'all 0.6s ease-out',
+          background: 'linear-gradient(180deg, #4a9eff 0%, #2060c0 50%, #1848a0 100%)',
+          color: 'white',
+          border: '2px solid rgba(255,255,255,0.3)',
+          borderRadius: '8px',
+          padding: '14px 40px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          fontFamily: 'Tahoma, sans-serif',
+          cursor: 'pointer',
+          letterSpacing: '1px',
+          boxShadow: '0 0 20px rgba(74, 158, 255, 0.4), 0 4px 15px rgba(0,0,0,0.5)',
+          animation: showButton ? 'wakeButtonPulse 2s ease-in-out infinite' : 'none',
+          position: 'relative',
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.background = 'linear-gradient(180deg, #5ab0ff 0%, #3070d0 50%, #2858b0 100%)';
+          e.currentTarget.style.boxShadow = '0 0 30px rgba(74, 158, 255, 0.6), 0 4px 20px rgba(0,0,0,0.5)';
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.background = 'linear-gradient(180deg, #4a9eff 0%, #2060c0 50%, #1848a0 100%)';
+          e.currentTarget.style.boxShadow = '0 0 20px rgba(74, 158, 255, 0.4), 0 4px 15px rgba(0,0,0,0.5)';
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+        }}
+      >
+        ⏻ Wake Up
+      </button>
+
+      <div style={{
+        color: 'rgba(255,255,255,0.3)',
+        fontSize: '11px',
+        marginTop: '20px',
+        fontFamily: 'Tahoma, sans-serif',
+        opacity: showButton ? 1 : 0,
+        transition: 'opacity 0.6s ease-out 0.3s',
+      }}>
+        Click to start Windows
+      </div>
+
+      <style jsx>{`
+        @keyframes sleepFadeIn {
+          from { opacity: 0; transform: scale(0.8); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes wakeButtonPulse {
+          0%, 100% { box-shadow: 0 0 20px rgba(74, 158, 255, 0.4), 0 4px 15px rgba(0,0,0,0.5); }
+          50% { box-shadow: 0 0 35px rgba(74, 158, 255, 0.7), 0 4px 20px rgba(0,0,0,0.5); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export default function Home() {
-  const [appState, setAppState] = useState<'boot' | 'welcome' | 'loggingoff' | 'desktop'>('boot');
+  const [appState, setAppState] = useState<'boot' | 'welcome' | 'loggingoff' | 'desktop' | 'sleep'>('boot');
 
   useEffect(() => {
     // Check if user has already seen boot screen this session
@@ -173,12 +269,22 @@ export default function Home() {
     setAppState('desktop');
   }, []);
 
+  const handleShutdown = useCallback(() => {
+    setAppState('sleep');
+  }, []);
+
+  const handleWakeUp = useCallback(() => {
+    sessionStorage.removeItem('xp-booted');
+    setAppState('boot');
+  }, []);
+
   return (
     <main style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
       {appState === 'boot' && <BootScreen onBootComplete={handleBootComplete} />}
       {appState === 'loggingoff' && <LogOffScreen onComplete={handleLogOffComplete} />}
       {appState === 'welcome' && <WelcomeScreen onLogin={handleLogin} />}
-      {appState === 'desktop' && <Desktop onLogOff={handleLogOff} />}
+      {appState === 'desktop' && <Desktop onLogOff={handleLogOff} onShutdown={handleShutdown} />}
+      {appState === 'sleep' && <SleepScreen onWakeUp={handleWakeUp} />}
     </main>
   );
 }

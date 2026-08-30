@@ -407,9 +407,10 @@ function snapToGrid(x: number, y: number) {
 
 interface DesktopProps {
   onLogOff: () => void;
+  onShutdown: () => void;
 }
 
-export default function Desktop({ onLogOff }: DesktopProps) {
+export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
   const [windows, setWindows] = useState<WindowState[]>(initialWindows);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
   const [selectedIcons, setSelectedIcons] = useState<Set<string>>(new Set());
@@ -449,10 +450,9 @@ export default function Desktop({ onLogOff }: DesktopProps) {
     setShowShutdownDialog(false);
     setShutdownState('shuttingdown');
     setTimeout(() => {
-      sessionStorage.removeItem('xp-booted');
-      window.location.reload();
+      onShutdown();
     }, 2000);
-  }, []);
+  }, [onShutdown]);
 
   const handleRestart = useCallback(() => {
     setShowShutdownDialog(false);
