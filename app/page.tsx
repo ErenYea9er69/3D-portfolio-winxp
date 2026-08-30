@@ -167,48 +167,77 @@ function SleepScreen({ onWakeUp }: { onWakeUp: () => void }) {
       zIndex: 99999,
       cursor: 'default',
     }}>
-      {/* Sleep GIFs Container */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '20px',
-        marginBottom: '40px',
-        width: '100%',
-        padding: '0 20px',
-      }}>
-        <img
-          src="/sleep1.gif"
-          alt="Sleep animation 1"
-          style={{ width: '200px', height: '200px', objectFit: 'contain', animation: 'sleepFadeIn 1s ease-out' }}
-        />
-        <img
-          src="/sleep2.gif"
-          alt="Sleep animation 2"
-          style={{ width: '200px', height: '200px', objectFit: 'contain', animation: 'sleepFadeIn 1s ease-out' }}
-        />
-        <img
-          src="/sleep.gif"
-          alt="Computer sleeping"
-          style={{
-            maxWidth: '320px',
-            maxHeight: '320px',
-            objectFit: 'contain',
-            animation: 'sleepFadeIn 1s ease-out',
-            margin: '0 10px',
-          }}
-        />
-        <img
-          src="/sleep3.gif"
-          alt="Sleep animation 3"
-          style={{ width: '200px', height: '200px', objectFit: 'contain', animation: 'sleepFadeIn 1s ease-out' }}
-        />
-        <img
-          src="/sleep4.gif"
-          alt="Sleep animation 4"
-          style={{ width: '200px', height: '200px', objectFit: 'contain', animation: 'sleepFadeIn 1s ease-out' }}
-        />
-      </div>
+      {/* Corner GIFs */}
+      <img
+        src="/sleep1.gif"
+        alt="Sleep animation 1"
+        style={{
+          position: 'absolute',
+          top: '10%',
+          left: '5%',
+          width: '350px',
+          height: '250px',
+          objectFit: 'contain',
+          animation: 'sleepFadeIn 1s ease-out',
+          opacity: 0.9,
+        }}
+      />
+      <img
+        src="/sleep2.gif"
+        alt="Sleep animation 2"
+        style={{
+          position: 'absolute',
+          bottom: '10%',
+          left: '5%',
+          width: '350px',
+          height: '250px',
+          objectFit: 'contain',
+          animation: 'sleepFadeIn 1s ease-out 0.2s both',
+          opacity: 0.9,
+        }}
+      />
+      <img
+        src="/sleep3.gif"
+        alt="Sleep animation 3"
+        style={{
+          position: 'absolute',
+          top: '10%',
+          right: '5%',
+          width: '350px',
+          height: '250px',
+          objectFit: 'contain',
+          animation: 'sleepFadeIn 1s ease-out 0.4s both',
+          opacity: 0.9,
+        }}
+      />
+      <img
+        src="/sleep4.gif"
+        alt="Sleep animation 4"
+        style={{
+          position: 'absolute',
+          bottom: '10%',
+          right: '5%',
+          width: '350px',
+          height: '250px',
+          objectFit: 'contain',
+          animation: 'sleepFadeIn 1s ease-out 0.6s both',
+          opacity: 0.9,
+        }}
+      />
+
+      {/* Main Center GIF */}
+      <img
+        src="/sleep.gif"
+        alt="Computer sleeping"
+        style={{
+          maxWidth: '450px',
+          maxHeight: '400px',
+          objectFit: 'contain',
+          animation: 'sleepFadeIn 1s ease-out',
+          marginBottom: '40px',
+          zIndex: 2,
+        }}
+      />
 
       {/* Wake Up Button */}
       <button
