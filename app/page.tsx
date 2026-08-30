@@ -269,47 +269,69 @@ function SleepScreen({ onWakeUp }: { onWakeUp: () => void }) {
         }}
       />
 
-      {/* Wake Up Button */}
-      <button
-        onClick={onWakeUp}
-        style={{
-          opacity: showButton ? 1 : 0,
-          transform: showButton ? 'translateY(0)' : 'translateY(20px)',
-          transition: 'all 0.6s ease-out',
-          background: 'linear-gradient(180deg, #4a9eff 0%, #2060c0 50%, #1848a0 100%)',
-          color: 'white',
-          border: '2px solid rgba(255,255,255,0.3)',
-          borderRadius: '8px',
-          padding: '14px 40px',
-          fontSize: '16px',
-          fontWeight: 'bold',
-          fontFamily: 'Tahoma, sans-serif',
-          cursor: 'pointer',
-          letterSpacing: '1px',
-          boxShadow: '0 0 20px rgba(74, 158, 255, 0.4), 0 4px 15px rgba(0,0,0,0.5)',
-          animation: showButton ? 'wakeButtonPulse 2s ease-in-out infinite' : 'none',
-          position: 'relative',
-        }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.background = 'linear-gradient(180deg, #5ab0ff 0%, #3070d0 50%, #2858b0 100%)';
-          e.currentTarget.style.boxShadow = '0 0 30px rgba(74, 158, 255, 0.6), 0 4px 20px rgba(0,0,0,0.5)';
-          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)';
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.background = 'linear-gradient(180deg, #4a9eff 0%, #2060c0 50%, #1848a0 100%)';
-          e.currentTarget.style.boxShadow = '0 0 20px rgba(74, 158, 255, 0.4), 0 4px 15px rgba(0,0,0,0.5)';
-          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <img 
-            src="/bye.gif" 
-            alt="Wake up icon" 
-            style={{ width: '20px', height: '20px', objectFit: 'contain' }} 
-          />
-          Wake Up
-        </div>
-      </button>
+      {/* Wake Up Button Container */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '20px',
+        opacity: showButton ? 1 : 0,
+        transform: showButton ? 'translateY(0)' : 'translateY(20px)',
+        transition: 'all 0.6s ease-out',
+      }}>
+        {/* Goku GIF */}
+        <img
+          src="/goku.gif"
+          alt="Goku"
+          style={{ width: '100px', height: '100px', objectFit: 'contain', filter: 'url(#remove-white)' }}
+        />
+
+        {/* Wake Up Button */}
+        <button
+          onClick={onWakeUp}
+          style={{
+            background: 'linear-gradient(180deg, #4a9eff 0%, #2060c0 50%, #1848a0 100%)',
+            color: 'white',
+            border: '2px solid rgba(255,255,255,0.3)',
+            borderRadius: '8px',
+            padding: '14px 40px',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            fontFamily: 'Tahoma, sans-serif',
+            cursor: 'pointer',
+            letterSpacing: '1px',
+            boxShadow: '0 0 20px rgba(74, 158, 255, 0.4), 0 4px 15px rgba(0,0,0,0.5)',
+            animation: showButton ? 'wakeButtonPulse 2s ease-in-out infinite' : 'none',
+            position: 'relative',
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(180deg, #5ab0ff 0%, #3070d0 50%, #2858b0 100%)';
+            e.currentTarget.style.boxShadow = '0 0 30px rgba(74, 158, 255, 0.6), 0 4px 20px rgba(0,0,0,0.5)';
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(180deg, #4a9eff 0%, #2060c0 50%, #1848a0 100%)';
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(74, 158, 255, 0.4), 0 4px 15px rgba(0,0,0,0.5)';
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <img 
+              src="/bye.gif" 
+              alt="Wake up icon" 
+              style={{ width: '20px', height: '20px', objectFit: 'contain' }} 
+            />
+            Wake Up
+          </div>
+        </button>
+
+        {/* Alien Dance GIF */}
+        <img
+          src="/alien-dance.gif"
+          alt="Alien Dance"
+          style={{ width: '100px', height: '100px', objectFit: 'contain', filter: 'url(#remove-white)' }}
+        />
+      </div>
 
       <div style={{
         color: 'rgba(255,255,255,0.3)',
