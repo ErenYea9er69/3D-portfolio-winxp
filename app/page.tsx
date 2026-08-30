@@ -225,6 +225,23 @@ function SleepScreen({ onWakeUp }: { onWakeUp: () => void }) {
         }}
       />
 
+      {/* Dance GIFs */}
+      <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', zIndex: 2 }}>
+        {[1, 2, 3, 4].map((i) => (
+          <img
+            key={`dance-${i}`}
+            src="/dance.gif"
+            alt={`Dance ${i}`}
+            style={{
+              width: '120px',
+              height: '120px',
+              objectFit: 'contain',
+              animation: 'sleepFadeIn 1s ease-out',
+            }}
+          />
+        ))}
+      </div>
+
       {/* Main Center GIF */}
       <img
         src="/sleep.gif"
