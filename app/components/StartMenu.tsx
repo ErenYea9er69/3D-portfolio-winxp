@@ -61,6 +61,9 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
     { id: 'solitaire', title: 'Solitaire', icon: '/icons xp/Windows XP Icons/Solitaire.png' },
     { id: 'paint', title: 'Paint', icon: '/icons xp/Windows XP Icons/Paint.png' },
     { id: 'snake', title: 'Snake', icon: '/icons xp/Windows XP Icons/Game Controller.png' },
+    { id: 'pinball', title: '3D Pinball', icon: '/icons xp/Windows XP Icons/Pinball.png' },
+    { id: 'spidersolitaire', title: 'Spider Solitaire', icon: '/icons xp/Windows XP Icons/Spider Solitaire.png' },
+    { id: 'wordpad', title: 'WordPad', icon: '/icons xp/Windows XP Icons/Wordpad.png' },
     { id: 'iexplorer', title: 'Internet Explorer', icon: '/icons xp/Windows XP Icons/Internet Explorer 6.png' },
   ];
 

@@ -24,6 +24,9 @@ import SnakeContent from './windows/SnakeContent';
 import ControlPanelContent from './windows/ControlPanelContent';
 import MediaPlayerContent from './windows/MediaPlayerContent';
 import CommandPromptContent from './windows/CommandPromptContent';
+import PinballContent from './windows/PinballContent';
+import SpiderSolitaireContent from './windows/SpiderSolitaireContent';
+import WordpadContent from './windows/WordpadContent';
 
 import DisplayPropertiesContent, { WallpaperOption } from './windows/DisplayPropertiesContent';
 import FolderContent from './windows/FolderContent';
@@ -382,6 +385,36 @@ const initialWindows: WindowState[] = [
     position: { x: 140, y: 80 },
     size: { width: 580, height: 380 },
   },
+  {
+    id: 'pinball',
+    title: '3D Pinball - Space Cadet',
+    icon: '/icons xp/Windows XP Icons/Pinball.png',
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 1,
+    position: { x: 180, y: 50 },
+    size: { width: 320, height: 620 },
+  },
+  {
+    id: 'spidersolitaire',
+    title: 'Spider Solitaire',
+    icon: '/icons xp/Windows XP Icons/Spider Solitaire.png',
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 1,
+    position: { x: 100, y: 30 },
+    size: { width: 600, height: 520 },
+  },
+  {
+    id: 'wordpad',
+    title: 'Document - WordPad',
+    icon: '/icons xp/Windows XP Icons/Wordpad.png',
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 1,
+    position: { x: 120, y: 40 },
+    size: { width: 560, height: 450 },
+  },
 ];
 
 const desktopIcons = [
@@ -400,6 +433,9 @@ const desktopIcons = [
   { id: 'solitaire', icon: '/icons xp/Windows XP Icons/Solitaire.png', label: 'Solitaire' },
   { id: 'paint', icon: '/icons xp/Windows XP Icons/Paint.png', label: 'Paint' },
   { id: 'snake', icon: '/icons xp/Windows XP Icons/Game Controller.png', label: 'Snake' },
+  { id: 'pinball', icon: '/icons xp/Windows XP Icons/Pinball.png', label: '3D Pinball' },
+  { id: 'spidersolitaire', icon: '/icons xp/Windows XP Icons/Spider Solitaire.png', label: 'Spider Solitaire' },
+  { id: 'wordpad', icon: '/icons xp/Windows XP Icons/Wordpad.png', label: 'WordPad' },
   { id: 'help', icon: '/icons xp/Windows XP Icons/Help and Support.png', label: 'Help' },
   { id: 'recycle', icon: '/icons xp/Windows XP Icons/Recycle Bin (empty).png', label: 'Recycle Bin' },
 ];
@@ -418,6 +454,9 @@ const menuItems = [
   { id: 'notepad', title: 'Notepad', icon: '/icons xp/Windows XP Icons/Notepad.png' },
   { id: 'calculator', title: 'Calculator', icon: '/icons xp/Windows XP Icons/Calculator.png' },
   { id: 'minesweeper', title: 'Minesweeper', icon: '/icons xp/Windows XP Icons/Minesweeper.png' },
+  { id: 'pinball', title: '3D Pinball', icon: '/icons xp/Windows XP Icons/Pinball.png' },
+  { id: 'spidersolitaire', title: 'Spider Solitaire', icon: '/icons xp/Windows XP Icons/Spider Solitaire.png' },
+  { id: 'wordpad', title: 'WordPad', icon: '/icons xp/Windows XP Icons/Wordpad.png' },
 ];
 
 // Grid geometry used for the free-drag / align-to-grid math.
@@ -903,6 +942,12 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
         return <MediaPlayerContent />;
       case 'cmd':
         return <CommandPromptContent onOpenApp={openWindow} />;
+      case 'pinball':
+        return <PinballContent />;
+      case 'spidersolitaire':
+        return <SpiderSolitaireContent />;
+      case 'wordpad':
+        return <WordpadContent />;
 
       case 'dispprops':
         return (
