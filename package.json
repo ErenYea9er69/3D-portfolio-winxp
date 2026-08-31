@@ -6,9 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:init": "node scripts/init-db.js",
+    "db:seed-assets": "node scripts/seed-assets.js"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "dotenv": "^17.4.2",
     "next": "15.1.9",
     "react": "19.0.0",
     "react-dom": "19.0.0"

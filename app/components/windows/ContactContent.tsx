@@ -1,37 +1,46 @@
 'use client';
 import { useState, FormEvent } from 'react';
 import XPIcon from '../XPIcon';
-
-const socialLinks = [
-  { name: 'GitHub', icon: '💻', url: 'https://github.com/StarKnightt' },
-  { name: 'Portfolio Source', icon: '⭐', url: 'https://github.com/StarKnightt/windows-xp-portfolio' },
-  { name: 'LinkedIn', icon: '💼', url: 'https://www.linkedin.com/in/prasenjitnayak/' },
-  { name: 'X (Twitter)', icon: '🐦', url: 'https://x.com/Star_Knight12' },
-  { name: 'YouTube', icon: '📺', url: 'https://youtube.com/@Star_Knight12' },
-  { name: 'CodePen', icon: '🎨', url: 'https://codepen.io/StarKnightt' },
-  { name: 'Buy Me a Coffee', icon: '☕', url: 'https://buymeacoffee.com/prasen' },
-];
+import { usePortfolioData } from '@/app/lib/usePortfolioData';
 
 export default function ContactContent() {
+  const { profile, submitContactMessage, isDbConnected } = usePortfolioData();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
     message: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [saveToDbSuccess, setSaveToDbSuccess] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Open email client with pre-filled data
+    setIsSubmitting(true);
+
+    try {
+      // 1. Submit directly to Neon DB
+      const dbResult = await submitContactMessage(formData);
+      if (dbResult.success) {
+        setSaveToDbSuccess(true);
+      }
+    } catch (err) {
+      console.warn('DB submission error:', err);
+    } finally {
+      setIsSubmitting(false);
+      setSubmitted(true);
+    }
+  };
+
+  const handleOpenMailClient = () => {
     const mailtoLink = `mailto:prasen.nayak@hotmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`From: ${formData.name} (${formData.email})\n\n${formData.message}`)}`;
     window.open(mailtoLink);
-    setSubmitted(true);
   };
 
   if (submitted) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+      <div style={{ textAlign: 'center', padding: '30px 20px' }}>
         <div style={{ 
           marginBottom: '15px',
           display: 'flex',
@@ -39,20 +48,40 @@ export default function ContactContent() {
         }}>
           <XPIcon src="/icons xp/Windows XP Icons/OE Send and Receive.png" size={54} alt="Sent" />
         </div>
-        <h2 style={{ color: '#0a246a', marginBottom: '10px' }}>Email Client Opened!</h2>
-        <p style={{ color: '#444', marginBottom: '20px' }}>
-          Complete sending the email in your mail app.<br />
-          I&apos;ll get back to you soon!
+        <h2 style={{ color: '#0a246a', marginBottom: '8px', fontSize: '16px' }}>
+          {saveToDbSuccess ? 'Message Saved to Neon Database!' : 'Message Sent!'}
+        </h2>
+        <p style={{ color: '#444', marginBottom: '15px', fontSize: '11px', lineHeight: 1.5 }}>
+          {saveToDbSuccess ? (
+            <>
+              Your message was received and safely stored in the PostgreSQL database.
+              <br />
+              Thank you for reaching out!
+            </>
+          ) : (
+            <>Complete sending the email in your mail app. I&apos;ll get back to you soon!</>
+          )}
         </p>
-        <button 
-          className="xp-button"
-          onClick={() => {
-            setSubmitted(false);
-            setFormData({ name: '', email: '', subject: '', message: '' });
-          }}
-        >
-          Send Another Message
-        </button>
+
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+          <button 
+            className="xp-button"
+            onClick={handleOpenMailClient}
+            style={{ fontSize: '11px' }}
+          >
+            ✉️ Also Open in Email App
+          </button>
+          <button 
+            className="xp-button"
+            onClick={() => {
+              setSubmitted(false);
+              setFormData({ name: '', email: '', subject: '', message: '' });
+            }}
+            style={{ fontSize: '11px' }}
+          >
+            Send Another Message
+          </button>
+        </div>
       </div>
     );
   }
@@ -63,18 +92,36 @@ export default function ContactContent() {
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
-        gap: '10px',
+        justifyContent: 'space-between',
         marginBottom: '12px',
         paddingBottom: '10px',
         borderBottom: '1px solid #e0e0e0'
       }}>
-        <XPIcon src="/icons xp/Windows XP Icons/Email.png" size={28} alt="Contact" />
-        <div>
-          <h2 style={{ margin: 0, fontSize: '14px' }}>Contact Me</h2>
-          <p style={{ margin: '2px 0 0', color: '#666', fontSize: '10px' }}>
-            Let&apos;s connect and build something amazing!
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <XPIcon src="/icons xp/Windows XP Icons/Email.png" size={28} alt="Contact" />
+          <div>
+            <h2 style={{ margin: 0, fontSize: '14px' }}>Contact Me</h2>
+            <p style={{ margin: '2px 0 0', color: '#666', fontSize: '10px' }}>
+              Let&apos;s connect and build something amazing!
+            </p>
+          </div>
         </div>
+        {isDbConnected && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            background: '#e8f5e9',
+            border: '1px solid #a5d6a7',
+            padding: '2px 6px',
+            borderRadius: '10px',
+            fontSize: '9px',
+            color: '#2e7d32',
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4caf50', display: 'inline-block' }} />
+            Neon DB Live
+          </div>
+        )}
       </div>
 
       {/* Social Links */}
@@ -86,7 +133,7 @@ export default function ContactContent() {
           gap: '6px',
           fontSize: '11px'
         }}>
-          {socialLinks.map(link => (
+          {(profile.social_links || []).map(link => (
             <a 
               key={link.name}
               href={link.url} 
@@ -140,7 +187,7 @@ export default function ContactContent() {
       {/* Contact Form */}
       <form onSubmit={handleSubmit}>
         <fieldset className="xp-fieldset">
-          <legend>Quick Message</legend>
+          <legend>Send Message to Database</legend>
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
             <div>
@@ -206,8 +253,13 @@ export default function ContactContent() {
             >
               Clear
             </button>
-            <button type="submit" className="xp-button">
-              📤 Send via Email
+            <button 
+              type="submit" 
+              className="xp-button"
+              disabled={isSubmitting}
+              style={{ fontWeight: 'bold', minWidth: '100px' }}
+            >
+              {isSubmitting ? 'Saving...' : '💾 Send to Cloud DB'}
             </button>
           </div>
         </fieldset>
@@ -220,7 +272,7 @@ export default function ContactContent() {
         textAlign: 'center',
         fontStyle: 'italic'
       }}>
-        Looking forward to hearing from you! 🙌
+        Looking forward to hearing from you! Messages are saved directly to Postgres. 🙌
       </div>
     </div>
   );

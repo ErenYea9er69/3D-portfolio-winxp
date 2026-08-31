@@ -1,82 +1,57 @@
 'use client';
 
 import XPIcon from '../XPIcon';
-
-const techStack = [
-  { name: 'React', icon: '⚛️', color: '#61dafb' },
-  { name: 'Next.js', icon: '▲', color: '#000' },
-  { name: 'TypeScript', icon: '📘', color: '#3178c6' },
-  { name: 'Node.js', icon: '🟢', color: '#339933' },
-  { name: 'TailwindCSS', icon: '🎨', color: '#06b6d4' },
-  { name: 'MongoDB', icon: '🍃', color: '#47a248' },
-  { name: 'Git', icon: '📦', color: '#f05032' },
-  { name: 'Rust', icon: '🦀', color: '#dea584' },
-  { name: 'Tauri', icon: '🖥️', color: '#ffc131' },
-];
-
-const categories = [
-  {
-    name: 'Frontend',
-    icon: '🎨',
-    color: '#4a90d9',
-    items: ['React', 'Next.js', 'TypeScript', 'TailwindCSS', 'Framer Motion', 'CSS3', 'HTML5'],
-  },
-  {
-    name: 'Backend',
-    icon: '⚙️',
-    color: '#5cb85c',
-    items: ['Node.js', 'Express.js', 'REST APIs', 'MongoDB', 'Prisma'],
-  },
-  {
-    name: 'Tools & DevOps',
-    icon: '🔧',
-    color: '#f0ad4e',
-    items: ['Git', 'GitHub', 'Vercel', 'VS Code', 'Vite', 'Docker'],
-  },
-  {
-    name: 'Exploring',
-    icon: '🚀',
-    color: '#9b59b6',
-    items: ['Rust', 'Tauri', 'AI/ML', 'WebSockets', 'PWA'],
-  },
-];
-
-const videos = [
-  { title: 'Track Your Coding time for free', url: 'https://youtu.be/tBatfQjWxCg' },
-  { title: 'Fix multi-cursor in VS Code', url: 'https://youtu.be/E9h7M6ZK_tA' },
-  { title: 'GitHub Copilot is now free!', url: 'https://www.youtube.com/watch?v=uIJOUe8T3_I' },
-  { title: 'How to run DeepSeek R1 locally', url: 'https://youtu.be/BgB2pW6QgVg' },
-];
+import { usePortfolioData } from '@/app/lib/usePortfolioData';
 
 export default function SkillsContent() {
+  const { skills, techStack, videos, isDbConnected } = usePortfolioData();
+
   return (
     <div>
       {/* Header */}
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
-        gap: '12px',
+        justifyContent: 'space-between',
         marginBottom: '15px',
         paddingBottom: '12px',
         borderBottom: '2px solid #0a246a'
       }}>
-        <div style={{
-          width: '40px',
-          height: '40px',
-          background: 'linear-gradient(135deg, #0078d4 0%, #0a246a 100%)',
-          borderRadius: '6px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <XPIcon src="/icons xp/Windows XP Icons/Performance.png" size={30} alt="Tech Stack" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            background: 'linear-gradient(135deg, #0078d4 0%, #0a246a 100%)',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <XPIcon src="/icons xp/Windows XP Icons/Performance.png" size={30} alt="Tech Stack" />
+          </div>
+          <div>
+            <h2 style={{ margin: 0, fontSize: '16px', color: '#0a246a' }}>Tech Stack</h2>
+            <p style={{ margin: '2px 0 0', color: '#666', fontSize: '11px' }}>
+              Technologies I work with
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 style={{ margin: 0, fontSize: '16px', color: '#0a246a' }}>Tech Stack</h2>
-          <p style={{ margin: '2px 0 0', color: '#666', fontSize: '11px' }}>
-            Technologies I work with
-          </p>
-        </div>
+        {isDbConnected && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            background: '#e8f5e9',
+            border: '1px solid #a5d6a7',
+            padding: '2px 6px',
+            borderRadius: '10px',
+            fontSize: '9px',
+            color: '#2e7d32',
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4caf50', display: 'inline-block' }} />
+            Neon DB Live
+          </div>
+        )}
       </div>
 
       {/* Main Tech Icons */}
@@ -130,7 +105,7 @@ export default function SkillsContent() {
         gap: '10px',
         marginBottom: '15px'
       }}>
-        {categories.map(category => (
+        {skills.map(category => (
           <div 
             key={category.name}
             style={{
@@ -158,7 +133,7 @@ export default function SkillsContent() {
               flexWrap: 'wrap', 
               gap: '4px' 
             }}>
-              {category.items.map(item => (
+              {(Array.isArray(category.items) ? category.items : []).map(item => (
                 <span 
                   key={item}
                   style={{

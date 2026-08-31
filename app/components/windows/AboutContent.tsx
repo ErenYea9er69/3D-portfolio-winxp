@@ -1,8 +1,11 @@
 'use client';
 
 import XPIcon from '../XPIcon';
+import { usePortfolioData } from '@/app/lib/usePortfolioData';
 
 export default function AboutContent() {
+  const { profile, isDbConnected } = usePortfolioData();
+
   return (
     <div style={{ maxWidth: '420px' }}>
       {/* Profile Header */}
@@ -14,7 +17,8 @@ export default function AboutContent() {
         padding: '15px',
         background: 'linear-gradient(135deg, #e8f4ff 0%, #d0e8ff 100%)',
         borderRadius: '8px',
-        border: '1px solid #b8d4f0'
+        border: '1px solid #b8d4f0',
+        position: 'relative',
       }}>
         <div style={{
           width: '80px',
@@ -30,17 +34,24 @@ export default function AboutContent() {
           overflow: 'hidden',
           padding: '6px',
         }}>
-          <XPIcon src="/icons xp/Windows XP Icons/User Accounts.png" size={54} alt="Prasenjit Nayak" />
+          <XPIcon src={profile.avatar_url || '/icons xp/Windows XP Icons/User Accounts.png'} size={54} alt={profile.name} />
         </div>
         <div style={{ flex: 1 }}>
-          <h2 style={{ margin: '0 0 4px 0', fontSize: '18px', color: '#0a246a', fontWeight: 'bold' }}>
-            Prasenjit Nayak
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h2 style={{ margin: '0 0 4px 0', fontSize: '18px', color: '#0a246a', fontWeight: 'bold' }}>
+              {profile.name}
+            </h2>
+            {isDbConnected && (
+              <span style={{ fontSize: '8px', background: '#e8f5e9', color: '#2e7d32', padding: '1px 5px', borderRadius: '4px', border: '1px solid #a5d6a7' }}>
+                Neon DB
+              </span>
+            )}
+          </div>
           <p style={{ margin: 0, color: '#0078d4', fontSize: '12px', fontWeight: 500 }}>
-            Full Stack Developer
+            {profile.title}
           </p>
           <p style={{ margin: '6px 0 0 0', color: '#666', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            📍 Odisha, India
+            📍 {profile.location}
           </p>
           <div style={{ 
             marginTop: '8px',
@@ -60,7 +71,7 @@ export default function AboutContent() {
               background: '#28a745',
               borderRadius: '50%',
             }} />
-            Available for work
+            {profile.status}
           </div>
         </div>
       </div>
@@ -73,10 +84,7 @@ export default function AboutContent() {
         color: '#444'
       }}>
         <p style={{ margin: '0 0 10px' }}>
-          I&apos;ve learned most of my lessons the hard way. Currently <strong>freelancing</strong> and collaborating with new people on exciting projects.
-        </p>
-        <p style={{ margin: 0 }}>
-          I love playing video games, sharing thoughts on tech, and touch typing in my free time.
+          {profile.bio}
         </p>
       </div>
 
@@ -89,8 +97,12 @@ export default function AboutContent() {
           padding: '10px',
         }}>
           <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>Education</div>
-          <div style={{ fontSize: '11px', fontWeight: 500, color: '#333' }}>B.Tech in CS & IT</div>
-          <div style={{ fontSize: '10px', color: '#666' }}>Trident Academy of Technology</div>
+          <div style={{ fontSize: '11px', fontWeight: 500, color: '#333' }}>
+            {profile.education?.[0]?.title || 'B.Tech in CS & IT'}
+          </div>
+          <div style={{ fontSize: '10px', color: '#666' }}>
+            {profile.education?.[0]?.subtitle || 'Trident Academy of Technology'}
+          </div>
         </div>
         <div style={{
           background: 'white',
@@ -99,8 +111,12 @@ export default function AboutContent() {
           padding: '10px',
         }}>
           <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>Experience</div>
-          <div style={{ fontSize: '11px', fontWeight: 500, color: '#333' }}>Freelance Developer</div>
-          <div style={{ fontSize: '10px', color: '#666' }}>v0 Ambassador by Vercel</div>
+          <div style={{ fontSize: '11px', fontWeight: 500, color: '#333' }}>
+            {profile.experience?.[0]?.title || 'Freelance Developer'}
+          </div>
+          <div style={{ fontSize: '10px', color: '#666' }}>
+            {profile.experience?.[0]?.subtitle || 'v0 Ambassador by Vercel'}
+          </div>
         </div>
       </div>
 
@@ -116,9 +132,9 @@ export default function AboutContent() {
           🏆 Achievements
         </div>
         <div style={{ fontSize: '11px', color: '#856404' }}>
-          <div style={{ marginBottom: '4px' }}>• Smart India Hackathon 2022 - EducationX</div>
-          <div style={{ marginBottom: '4px' }}>• Smart India Hackathon 2023 - NexusLink</div>
-          <div>• v0 Ambassador by Vercel</div>
+          {(profile.achievements || []).map((ach, idx) => (
+            <div key={idx} style={{ marginBottom: '4px' }}>• {ach}</div>
+          ))}
         </div>
       </div>
 
@@ -128,27 +144,16 @@ export default function AboutContent() {
         gap: '8px',
         flexWrap: 'wrap'
       }}>
-        <button 
-          className="xp-button"
-          onClick={() => window.open('https://github.com/StarKnightt', '_blank')}
-          style={{ flex: 1 }}
-        >
-          💻 GitHub
-        </button>
-        <button 
-          className="xp-button"
-          onClick={() => window.open('https://youtube.com/@Star_Knight12', '_blank')}
-          style={{ flex: 1 }}
-        >
-          📺 YouTube
-        </button>
-        <button 
-          className="xp-button"
-          onClick={() => window.open('https://linkedin.com/in/prasenjitnayak', '_blank')}
-          style={{ flex: 1 }}
-        >
-          💼 LinkedIn
-        </button>
+        {(profile.social_links || []).slice(0, 3).map((link, idx) => (
+          <button 
+            key={idx}
+            className="xp-button"
+            onClick={() => window.open(link.url, '_blank')}
+            style={{ flex: 1 }}
+          >
+            {link.icon} {link.name}
+          </button>
+        ))}
       </div>
 
       {/* Portfolio Source */}
@@ -174,7 +179,7 @@ export default function AboutContent() {
         paddingTop: '10px',
         borderTop: '1px solid #e0e0e0'
       }}>
-        © {new Date().getFullYear()} Prasenjit Nayak • Windows XP Portfolio Edition
+        © {new Date().getFullYear()} {profile.name} • Windows XP Portfolio Edition (Neon DB)
       </p>
     </div>
   );

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import XPIcon from '../XPIcon';
+import { usePortfolioData } from '@/app/lib/usePortfolioData';
 
 interface PictureItem {
   id: string;
@@ -11,58 +12,20 @@ interface PictureItem {
   size?: string;
 }
 
-const DEFAULT_GALLERY: PictureItem[] = [
-  {
-    id: 'bliss',
-    title: 'Bliss (Windows XP Wallpaper).jpg',
-    src: '/windows_xp_original-wallpaper-1920x1080.jpg',
-    dimensions: '1920 x 1080',
-    size: '562 KB',
-  },
-  {
-    id: 'og',
-    title: '3D Portfolio Showcase.png',
-    src: '/og.png',
-    dimensions: '1200 x 630',
-    size: '1.65 MB',
-  },
-  {
-    id: 'alien',
-    title: 'Alien Dance Animation.gif',
-    src: '/alien-dance.gif',
-    dimensions: '400 x 400',
-    size: '1.11 MB',
-  },
-  {
-    id: 'goku',
-    title: 'Goku Retro Animation.gif',
-    src: '/goku.gif',
-    dimensions: '320 x 240',
-    size: '189 KB',
-  },
-  {
-    id: 'dance',
-    title: 'Retro XP Dancing.gif',
-    src: '/dance.gif',
-    dimensions: '300 x 300',
-    size: '375 KB',
-  },
-  {
-    id: 'sleep',
-    title: 'Sleeping Cat.gif',
-    src: '/sleep.gif',
-    dimensions: '450 x 300',
-    size: '1.89 MB',
-  },
-];
-
 export default function PictureViewerContent() {
-  const [gallery, setGallery] = useState<PictureItem[]>(DEFAULT_GALLERY);
+  const { pictures: dbPictures, isDbConnected } = usePortfolioData();
+  const [gallery, setGallery] = useState<PictureItem[]>(dbPictures);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [isBestFit, setIsBestFit] = useState(true);
   const [isSlideshow, setIsSlideshow] = useState(false);
+
+  useEffect(() => {
+    if (dbPictures && dbPictures.length > 0) {
+      setGallery(dbPictures);
+    }
+  }, [dbPictures]);
 
   // Pan offset when zoomed in
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
@@ -220,10 +183,15 @@ export default function PictureViewerContent() {
           <XPIcon src="/icons xp/Windows XP Icons/Windows Picture and Fax Viewer.png" size={16} alt="" />
           <span style={{ fontWeight: 'bold' }}>{currentPicture?.title}</span>
         </div>
-        <div style={{ color: '#555', fontSize: '10px' }}>
-          {gallery.length > 0 ? `Image ${currentIndex + 1} of ${gallery.length}` : 'No Images'}
-          {currentPicture?.size ? ` • ${currentPicture.size}` : ''}
-          {currentPicture?.dimensions ? ` • ${currentPicture.dimensions}` : ''}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isDbConnected && (
+            <span style={{ fontSize: '9px', color: '#2e7d32' }}>🟢 DB Gallery</span>
+          )}
+          <div style={{ color: '#555', fontSize: '10px' }}>
+            {gallery.length > 0 ? `Image ${currentIndex + 1} of ${gallery.length}` : 'No Images'}
+            {currentPicture?.size ? ` • ${currentPicture.size}` : ''}
+            {currentPicture?.dimensions ? ` • ${currentPicture.dimensions}` : ''}
+          </div>
         </div>
       </div>
 
