@@ -27,6 +27,9 @@ import CommandPromptContent from './windows/CommandPromptContent';
 import PinballContent from './windows/PinballContent';
 import SpiderSolitaireContent from './windows/SpiderSolitaireContent';
 import WordpadContent from './windows/WordpadContent';
+import TaskManagerContent from './windows/TaskManagerContent';
+import MsnMessengerContent from './windows/MsnMessengerContent';
+import PictureViewerContent from './windows/PictureViewerContent';
 
 import DisplayPropertiesContent, { WallpaperOption } from './windows/DisplayPropertiesContent';
 import FolderContent from './windows/FolderContent';
@@ -415,6 +418,36 @@ const initialWindows: WindowState[] = [
     position: { x: 120, y: 40 },
     size: { width: 560, height: 450 },
   },
+  {
+    id: 'taskmgr',
+    title: 'Windows Task Manager',
+    icon: '/icons xp/Windows XP Icons/Task Manager.png',
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 1,
+    position: { x: 220, y: 60 },
+    size: { width: 460, height: 490 },
+  },
+  {
+    id: 'msnmsgr',
+    title: 'MSN Messenger',
+    icon: '/icons xp/Windows XP Icons/MSN Messenger.png',
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 1,
+    position: { x: 180, y: 40 },
+    size: { width: 560, height: 500 },
+  },
+  {
+    id: 'pictureviewer',
+    title: 'Windows Picture and Fax Viewer',
+    icon: '/icons xp/Windows XP Icons/Windows Picture and Fax Viewer.png',
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 1,
+    position: { x: 140, y: 50 },
+    size: { width: 620, height: 490 },
+  },
 ];
 
 const desktopIcons = [
@@ -436,12 +469,17 @@ const desktopIcons = [
   { id: 'pinball', icon: '/icons xp/Windows XP Icons/Pinball.png', label: '3D Pinball' },
   { id: 'spidersolitaire', icon: '/icons xp/Windows XP Icons/Spider Solitaire.png', label: 'Spider Solitaire' },
   { id: 'wordpad', icon: '/icons xp/Windows XP Icons/Wordpad.png', label: 'WordPad' },
+  { id: 'msnmsgr', icon: '/icons xp/Windows XP Icons/MSN Messenger.png', label: 'MSN Messenger' },
+  { id: 'pictureviewer', icon: '/icons xp/Windows XP Icons/Windows Picture and Fax Viewer.png', label: 'Picture Viewer' },
+  { id: 'taskmgr', icon: '/icons xp/Windows XP Icons/Task Manager.png', label: 'Task Manager' },
   { id: 'help', icon: '/icons xp/Windows XP Icons/Help and Support.png', label: 'Help' },
   { id: 'recycle', icon: '/icons xp/Windows XP Icons/Recycle Bin (empty).png', label: 'Recycle Bin' },
 ];
 
 const menuItems = [
   { id: 'iexplorer', title: 'Internet Explorer', icon: '/icons xp/Windows XP Icons/Internet Explorer 6.png' },
+  { id: 'msnmsgr', title: 'MSN Messenger', icon: '/icons xp/Windows XP Icons/MSN Messenger.png' },
+  { id: 'pictureviewer', title: 'Windows Picture Viewer', icon: '/icons xp/Windows XP Icons/Windows Picture and Fax Viewer.png' },
   { id: 'mediaplayer', title: 'Windows Media Player', icon: '/icons xp/Windows XP Icons/Windows Media Player 10.png' },
   { id: 'mycomputer', title: 'My Computer', icon: '/icons xp/Windows XP Icons/My Computer.png' },
   { id: 'about', title: 'About Me', icon: '/icons xp/Windows XP Icons/User Accounts.png' },
@@ -450,6 +488,7 @@ const menuItems = [
   { id: 'contact', title: 'Contact', icon: '/icons xp/Windows XP Icons/Email.png' },
   { id: 'controlpanel', title: 'Control Panel', icon: '/icons xp/Windows XP Icons/Control Panel.png' },
   // Apps below the divider
+  { id: 'taskmgr', title: 'Task Manager', icon: '/icons xp/Windows XP Icons/Task Manager.png' },
   { id: 'cmd', title: 'Command Prompt', icon: '/icons xp/Windows XP Icons/Command Prompt.png' },
   { id: 'notepad', title: 'Notepad', icon: '/icons xp/Windows XP Icons/Notepad.png' },
   { id: 'calculator', title: 'Calculator', icon: '/icons xp/Windows XP Icons/Calculator.png' },
@@ -601,6 +640,18 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
     ));
     setActiveWindowId(id);
   }, [highestZIndex]);
+
+  // Global keyboard shortcuts (Ctrl+Shift+Esc for Task Manager)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'Escape') {
+        e.preventDefault();
+        openWindow('taskmgr');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [openWindow]);
 
   const restoreWindow = useCallback((id: string) => {
     setHighestZIndex(prev => prev + 1);
@@ -878,6 +929,7 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
       ],
     },
     { divider: true },
+    { label: 'Task Manager', icon: '/icons xp/Windows XP Icons/Task Manager.png', onClick: () => openWindow('taskmgr') },
     { label: 'Properties', icon: '/icons xp/Windows XP Icons/Display Properties.png', onClick: () => openWindow('dispprops') },
   ];
 
@@ -948,6 +1000,21 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
         return <SpiderSolitaireContent />;
       case 'wordpad':
         return <WordpadContent />;
+      case 'taskmgr':
+        return (
+          <TaskManagerContent
+            openWindows={windows
+              .filter(w => w.isOpen && w.id !== 'taskmgr')
+              .map(w => ({ id: w.id, title: w.title, icon: w.icon, isMinimized: w.isMinimized }))}
+            onCloseWindow={closeWindow}
+            onFocusWindow={focusWindow}
+            onOpenApp={openWindow}
+          />
+        );
+      case 'msnmsgr':
+        return <MsnMessengerContent />;
+      case 'pictureviewer':
+        return <PictureViewerContent />;
 
       case 'dispprops':
         return (

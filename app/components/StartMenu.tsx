@@ -64,6 +64,9 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
     { id: 'pinball', title: '3D Pinball', icon: '/icons xp/Windows XP Icons/Pinball.png' },
     { id: 'spidersolitaire', title: 'Spider Solitaire', icon: '/icons xp/Windows XP Icons/Spider Solitaire.png' },
     { id: 'wordpad', title: 'WordPad', icon: '/icons xp/Windows XP Icons/Wordpad.png' },
+    { id: 'msnmsgr', title: 'MSN Messenger', icon: '/icons xp/Windows XP Icons/MSN Messenger.png' },
+    { id: 'pictureviewer', title: 'Picture and Fax Viewer', icon: '/icons xp/Windows XP Icons/Windows Picture and Fax Viewer.png' },
+    { id: 'taskmgr', title: 'Task Manager', icon: '/icons xp/Windows XP Icons/Task Manager.png' },
     { id: 'iexplorer', title: 'Internet Explorer', icon: '/icons xp/Windows XP Icons/Internet Explorer 6.png' },
   ];
 
@@ -205,6 +208,21 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
                   </div>
                   <span style={{ fontSize: '11px' }}>Calculator</span>
                 </div>
+                <div className="xp-start-menu-item" onClick={() => handleItemClick('taskmgr')}>
+                  <div className="xp-start-menu-item-icon" style={{ width: '18px', height: '18px' }}>
+                    <XPIcon src="/icons xp/Windows XP Icons/Task Manager.png" size={16} alt="Task Manager" />
+                  </div>
+                  <span style={{ fontSize: '11px' }}>Task Manager</span>
+                </div>
+                <div style={{ fontSize: '10px', color: '#666', padding: '4px 8px', fontWeight: 'bold', borderTop: '1px solid #ccc', marginTop: '4px' }}>
+                  Communication
+                </div>
+                <div className="xp-start-menu-item" onClick={() => handleItemClick('msnmsgr')}>
+                  <div className="xp-start-menu-item-icon" style={{ width: '18px', height: '18px' }}>
+                    <XPIcon src="/icons xp/Windows XP Icons/MSN Messenger.png" size={16} alt="MSN Messenger" />
+                  </div>
+                  <span style={{ fontSize: '11px' }}>MSN Messenger</span>
+                </div>
                 <div style={{ fontSize: '10px', color: '#666', padding: '4px 8px', fontWeight: 'bold', borderTop: '1px solid #ccc', marginTop: '4px' }}>
                   Entertainment & Media
                 </div>
@@ -213,6 +231,12 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
                     <XPIcon src="/icons xp/Windows XP Icons/Windows Media Player 10.png" size={16} alt="Media Player" />
                   </div>
                   <span style={{ fontSize: '11px' }}>Windows Media Player</span>
+                </div>
+                <div className="xp-start-menu-item" onClick={() => handleItemClick('pictureviewer')}>
+                  <div className="xp-start-menu-item-icon" style={{ width: '18px', height: '18px' }}>
+                    <XPIcon src="/icons xp/Windows XP Icons/Windows Picture and Fax Viewer.png" size={16} alt="Picture Viewer" />
+                  </div>
+                  <span style={{ fontSize: '11px' }}>Picture & Fax Viewer</span>
                 </div>
                 <div style={{ fontSize: '10px', color: '#666', padding: '4px 8px', fontWeight: 'bold', borderTop: '1px solid #ccc', marginTop: '4px' }}>
                   Games
@@ -267,6 +291,15 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
                 <XPIcon src="/icons xp/Windows XP Icons/My Documents.png" size={20} alt="My Projects" />
               </div>
               <span style={{ fontSize: '11px', fontWeight: 'bold' }}>My Projects</span>
+            </div>
+            <div 
+              className="xp-start-menu-item"
+              onClick={() => handleItemClick('pictureviewer')}
+            >
+              <div className="xp-start-menu-item-icon" style={{ width: '22px', height: '22px' }}>
+                <XPIcon src="/icons xp/Windows XP Icons/My Pictures.png" size={20} alt="My Pictures" />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 'bold' }}>My Pictures</span>
             </div>
             <div 
               className="xp-start-menu-item"

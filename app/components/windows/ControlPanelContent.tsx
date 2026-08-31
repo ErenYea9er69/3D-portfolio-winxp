@@ -229,9 +229,12 @@ export default function ControlPanelContent({ onOpenApp }: ControlPanelContentPr
     { name: 'Regional Settings', icon: '/icons xp/Windows XP Icons/Regional Settings.png', action: () => setActiveTab('system') },
     { name: 'Security Center', icon: '/icons xp/Windows XP Icons/Security Center.png', action: () => setActiveTab('security') },
     { name: 'System Properties', icon: '/icons xp/Windows XP Icons/System Properties.png', action: () => setActiveTab('system') },
+    { name: 'Task Manager', icon: '/icons xp/Windows XP Icons/Task Manager.png', action: () => onOpenApp?.('taskmgr') },
     { name: 'Taskbar and Start Menu', icon: '/icons xp/Windows XP Icons/Taskbar and Start Menu.png', action: () => onOpenApp?.('dispprops') },
     { name: 'User Accounts', icon: '/icons xp/Windows XP Icons/User Accounts.png', action: () => onOpenApp?.('about') },
     { name: 'Windows Media Player', icon: '/icons xp/Windows XP Icons/Windows Media Player 10.png', action: () => onOpenApp?.('mediaplayer') },
+    { name: 'Windows Messenger', icon: '/icons xp/Windows XP Icons/MSN Messenger.png', action: () => onOpenApp?.('msnmsgr') },
+    { name: 'Picture & Fax Viewer', icon: '/icons xp/Windows XP Icons/Windows Picture and Fax Viewer.png', action: () => onOpenApp?.('pictureviewer') },
     { name: 'Command Prompt', icon: '/icons xp/Windows XP Icons/Command Prompt.png', action: () => onOpenApp?.('cmd') },
   ];
 
