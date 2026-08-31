@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import XPIcon from './XPIcon';
 
 export interface MenuItem {
   label?: string;
@@ -103,8 +104,8 @@ function MenuList({
                 <span style={{ position: 'absolute', left: '6px', fontSize: '11px' }}>✓</span>
               )}
               {item.icon && !item.checked && (
-                <span style={{ position: 'absolute', left: '6px', fontSize: '12px' }}>
-                  {item.icon}
+                <span style={{ position: 'absolute', left: '6px', display: 'flex', alignItems: 'center' }}>
+                  <XPIcon src={item.icon} size={15} />
                 </span>
               )}
               <span style={{ flex: 1 }}>{item.label}</span>

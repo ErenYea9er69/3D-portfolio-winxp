@@ -1,5 +1,7 @@
 'use client';
 
+import XPIcon from '../XPIcon';
+
 const projects = [
   {
     id: 1,
@@ -77,7 +79,7 @@ export default function ProjectsContent() {
         paddingBottom: '10px',
         borderBottom: '1px solid #e0e0e0'
       }}>
-        <span style={{ fontSize: '24px' }}>📁</span>
+        <XPIcon src="/icons xp/Windows XP Icons/Folder Closed.png" size={28} alt="Projects" />
         <div>
           <h2 style={{ margin: 0, fontSize: '14px' }}>My Projects</h2>
           <p style={{ margin: '2px 0 0', color: '#666', fontSize: '10px' }}>

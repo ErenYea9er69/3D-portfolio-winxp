@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import XPIcon from '../XPIcon';
 
 interface RunDialogContentProps {
   onOpenApp: (appId: string) => void;
@@ -56,7 +57,9 @@ export default function RunDialogContent({ onOpenApp }: RunDialogContentProps) {
   return (
     <div style={{ padding: '5px 0' }}>
       <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-        <div style={{ fontSize: '32px' }}>📦</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px' }}>
+          <XPIcon src="/icons xp/Windows XP Icons/Run.png" size={32} alt="Run" />
+        </div>
         <div style={{ flex: 1 }}>
           <p style={{ margin: '0 0 10px', fontSize: '11px' }}>
             Type the name of a program, and Windows will open it for you.

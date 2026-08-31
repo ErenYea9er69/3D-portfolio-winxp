@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, ReactNode } from 'react';
+import XPIcon from './XPIcon';
 
 interface WindowProps {
   id: string;
@@ -292,7 +293,9 @@ export default function Window({
           borderRadius: isMaximized ? 0 : undefined,
         }}
       >
-        <div className="xp-window-title-icon">{icon}</div>
+        <div className="xp-window-title-icon">
+          <XPIcon src={icon} size={16} />
+        </div>
         <span className="xp-window-title-text">{title}</span>
         <div className="xp-window-controls">
           <button 

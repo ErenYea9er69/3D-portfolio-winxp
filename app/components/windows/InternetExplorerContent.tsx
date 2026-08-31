@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import XPIcon from '../XPIcon';
 
 export default function InternetExplorerContent() {
   const [addressBar, setAddressBar] = useState('');
@@ -54,9 +55,10 @@ export default function InternetExplorerContent() {
         }}>
           <button 
             onClick={goHome}
-            style={{ padding: '4px 12px', fontSize: '11px', cursor: 'pointer' }}
+            className="xp-button"
+            style={{ padding: '3px 10px', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', minWidth: 'auto', minHeight: 'auto' }}
           >
-            🏠 Home
+            <XPIcon src="/icons xp/Windows XP Icons/IE Home.png" size={16} /> Home
           </button>
           <div style={{
             flex: 1,
@@ -83,7 +85,8 @@ export default function InternetExplorerContent() {
           </div>
           <button 
             onClick={() => navigateTo(addressBar)}
-            style={{ padding: '4px 16px', fontSize: '11px', cursor: 'pointer' }}
+            className="xp-button"
+            style={{ padding: '3px 14px', fontSize: '11px', cursor: 'pointer', minWidth: 'auto', minHeight: 'auto' }}
           >
             Go
           </button>
@@ -97,7 +100,9 @@ export default function InternetExplorerContent() {
           overflowY: 'auto',
         }}>
           <div style={{ maxWidth: '500px', margin: '0 auto', textAlign: 'center' }}>
-            <div style={{ fontSize: '48px', marginBottom: '10px' }}>🌐</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+              <XPIcon src="/icons xp/Windows XP Icons/Internet Explorer 6.png" size={64} alt="Internet Explorer" />
+            </div>
             <h1 style={{ fontSize: '22px', color: '#0066cc', margin: '0 0 5px', fontWeight: 'normal' }}>
               Internet Explorer
             </h1>
@@ -139,9 +144,12 @@ export default function InternetExplorerContent() {
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: '13px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
                 }}
               >
-                🔍 Search
+                <XPIcon src="/icons xp/Windows XP Icons/Search.png" size={16} /> Search
               </button>
             </div>
 
@@ -231,15 +239,18 @@ export default function InternetExplorerContent() {
       }}>
         <button 
           onClick={goHome}
-          style={{ padding: '4px 12px', fontSize: '11px', cursor: 'pointer' }}
+          className="xp-button"
+          style={{ padding: '3px 10px', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', minWidth: 'auto', minHeight: 'auto' }}
         >
-          🏠 Home
+          <XPIcon src="/icons xp/Windows XP Icons/IE Home.png" size={16} /> Home
         </button>
         <button 
           onClick={() => { setIsLoading(true); setTimeout(() => setIsLoading(false), 500); }}
-          style={{ padding: '4px 8px', fontSize: '11px', cursor: 'pointer' }}
+          className="xp-button"
+          style={{ padding: '3px 8px', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', minWidth: 'auto', minHeight: 'auto' }}
+          title="Refresh"
         >
-          🔄
+          <XPIcon src="/icons xp/Windows XP Icons/IE Refresh.png" size={16} />
         </button>
         <div style={{
           flex: 1,
@@ -266,7 +277,8 @@ export default function InternetExplorerContent() {
         </div>
         <button 
           onClick={() => navigateTo(addressBar)}
-          style={{ padding: '4px 16px', fontSize: '11px', cursor: 'pointer' }}
+          className="xp-button"
+          style={{ padding: '3px 14px', fontSize: '11px', cursor: 'pointer', minWidth: 'auto', minHeight: 'auto' }}
         >
           Go
         </button>
@@ -283,7 +295,7 @@ export default function InternetExplorerContent() {
             height: '100%',
             gap: '10px',
           }}>
-            <div style={{ fontSize: '32px' }}>🌐</div>
+            <XPIcon src="/icons xp/Windows XP Icons/Internet Explorer 6.png" size={48} />
             <div style={{ color: '#666' }}>Loading...</div>
           </div>
         ) : (

@@ -1,5 +1,7 @@
 'use client';
 import { useState, FormEvent } from 'react';
+import XPIcon from '../XPIcon';
+
 const socialLinks = [
   { name: 'GitHub', icon: '💻', url: 'https://github.com/StarKnightt' },
   { name: 'Portfolio Source', icon: '⭐', url: 'https://github.com/StarKnightt/windows-xp-portfolio' },
@@ -31,10 +33,11 @@ export default function ContactContent() {
     return (
       <div style={{ textAlign: 'center', padding: '40px 20px' }}>
         <div style={{ 
-          fontSize: '48px', 
           marginBottom: '15px',
+          display: 'flex',
+          justifyContent: 'center',
         }}>
-          ✉️
+          <XPIcon src="/icons xp/Windows XP Icons/OE Send and Receive.png" size={54} alt="Sent" />
         </div>
         <h2 style={{ color: '#0a246a', marginBottom: '10px' }}>Email Client Opened!</h2>
         <p style={{ color: '#444', marginBottom: '20px' }}>
@@ -65,7 +68,7 @@ export default function ContactContent() {
         paddingBottom: '10px',
         borderBottom: '1px solid #e0e0e0'
       }}>
-        <span style={{ fontSize: '24px' }}>📧</span>
+        <XPIcon src="/icons xp/Windows XP Icons/Email.png" size={28} alt="Contact" />
         <div>
           <h2 style={{ margin: 0, fontSize: '14px' }}>Contact Me</h2>
           <p style={{ margin: '2px 0 0', color: '#666', fontSize: '10px' }}>
@@ -113,13 +116,13 @@ export default function ContactContent() {
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '8px',
+          gap: '10px',
           padding: '8px',
           background: '#f0f8ff',
           border: '1px solid #b0d0ff',
           borderRadius: '2px'
         }}>
-          <span style={{ fontSize: '20px' }}>📧</span>
+          <XPIcon src="/icons xp/Windows XP Icons/OE Create Mail.png" size={24} alt="Email" />
           <div>
             <a 
               href="mailto:prasen.nayak@hotmail.com"

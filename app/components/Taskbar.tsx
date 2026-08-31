@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import XPIcon from './XPIcon';
 
 interface WindowInfo {
   id: string;
@@ -257,7 +258,9 @@ function TaskbarButton({
           animation: isNew ? 'taskbarSlideIn 0.15s ease-out' : 'none',
         }}
       >
-        <span className="xp-taskbar-item-icon">{window.icon}</span>
+        <span className="xp-taskbar-item-icon">
+          <XPIcon src={window.icon} size={15} />
+        </span>
         <span className="xp-taskbar-item-title">{window.title}</span>
       </button>
 
@@ -330,11 +333,7 @@ export default function Taskbar({
         onClick={onShowDesktop}
         title="Show Desktop"
       >
-        <svg width="16" height="16" viewBox="0 0 16 16">
-          <rect x="1" y="1" width="14" height="10" fill="#e8f0fa" stroke="#4a6fa5" strokeWidth="1" />
-          <rect x="1" y="1" width="14" height="2.5" fill="#4a6fa5" />
-          <rect x="0" y="13" width="16" height="2" fill="#8fa8c9" />
-        </svg>
+        <XPIcon src="/icons xp/Windows XP Icons/Desktop.png" size={16} alt="Show Desktop" />
       </button>
       
       {/* Quick Launch Divider */}
@@ -367,12 +366,16 @@ export default function Taskbar({
             className="xp-tray-icon"
             title="Volume"
             onClick={() => setShowVolume(v => !v)}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
           >
-            🔊
+            <XPIcon src="/icons xp/Windows XP Icons/Volume.png" size={15} alt="Volume" />
           </span>
-          <span className="xp-tray-icon" title="Network - Connected">📶</span>
-          <span className="xp-tray-icon" title="Security">🛡️</span>
+          <span className="xp-tray-icon" title="Network - Connected" style={{ display: 'flex', alignItems: 'center' }}>
+            <XPIcon src="/icons xp/Windows XP Icons/Wireless Network Connection.png" size={15} alt="Network" />
+          </span>
+          <span className="xp-tray-icon" title="Security Center" style={{ display: 'flex', alignItems: 'center' }}>
+            <XPIcon src="/icons xp/Windows XP Icons/Security Center.png" size={15} alt="Security Center" />
+          </span>
         </div>
         <div className="xp-tray-clock">
           <Clock />

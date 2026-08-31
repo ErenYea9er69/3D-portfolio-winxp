@@ -1,6 +1,7 @@
 'use client';
 
 import { MouseEvent } from 'react';
+import XPIcon from './XPIcon';
 
 interface DesktopIconProps {
   icon: string;
@@ -29,7 +30,9 @@ export default function DesktopIcon({
       onContextMenu={onContextMenu}
       onMouseDown={onMouseDown}
     >
-      <div className="xp-desktop-icon-image">{icon}</div>
+      <div className="xp-desktop-icon-image">
+        <XPIcon src={icon} size={36} alt={label} />
+      </div>
       <span className="xp-desktop-icon-label">{label}</span>
     </div>
   );

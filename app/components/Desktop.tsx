@@ -5,6 +5,7 @@ import Window from './Window';
 import Taskbar from './Taskbar';
 import StartMenu from './StartMenu';
 import DesktopIcon from './DesktopIcon';
+import XPIcon from './XPIcon';
 import AboutContent from './windows/AboutContent';
 import ProjectsContent from './windows/ProjectsContent';
 import SkillsContent from './windows/SkillsContent';
@@ -92,16 +93,18 @@ function ShutdownDialog({ onCancel, onShutdown, onRestart, onLogOff }: ShutdownD
         textAlign: 'center',
         maxWidth: '400px',
       }}>
-        <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏻</div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+          <XPIcon src="/icons xp/Windows XP Icons/Power.png" size={28} alt="Turn Off" />
+        </div>
         <h2 style={{ color: 'white', margin: '0 0 20px', fontSize: '16px', fontWeight: 'normal' }}>
           What do you want the computer to do?
         </h2>
         
         <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '25px' }}>
           {[
-            { id: 'standby', icon: '😴', label: 'Stand By' },
-            { id: 'shutdown', icon: '⏻', label: 'Turn Off' },
-            { id: 'restart', icon: '🔄', label: 'Restart' },
+            { id: 'standby', icon: '/icons xp/Windows XP Icons/Standby.png', label: 'Stand By' },
+            { id: 'shutdown', icon: '/icons xp/Windows XP Icons/Power.png', label: 'Turn Off' },
+            { id: 'restart', icon: '/icons xp/Windows XP Icons/Restart.png', label: 'Restart' },
           ].map((option) => (
             <div
               key={option.id}
@@ -115,12 +118,13 @@ function ShutdownDialog({ onCancel, onShutdown, onRestart, onLogOff }: ShutdownD
               }}
             >
               <div style={{ 
-                fontSize: '32px', 
                 marginBottom: '5px',
-                filter: option.id === 'shutdown' ? 'hue-rotate(0deg) saturate(1.5)' : 'none',
-                color: option.id === 'shutdown' ? '#ff6b6b' : 'white',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '36px',
               }}>
-                {option.icon}
+                <XPIcon src={option.icon} size={32} alt={option.label} />
               </div>
               <div style={{ color: 'white', fontSize: '11px' }}>{option.label}</div>
             </div>
@@ -188,7 +192,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'mycomputer',
     title: 'My Computer',
-    icon: '💻',
+    icon: '/icons xp/Windows XP Icons/My Computer.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -198,7 +202,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'about',
     title: 'About Me',
-    icon: '👤',
+    icon: '/icons xp/Windows XP Icons/User Accounts.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -208,7 +212,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'projects',
     title: 'My Projects',
-    icon: '📁',
+    icon: '/icons xp/Windows XP Icons/Folder Closed.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -218,7 +222,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'skills',
     title: 'Skills',
-    icon: '📊',
+    icon: '/icons xp/Windows XP Icons/Performance.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -228,7 +232,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'contact',
     title: 'Contact',
-    icon: '📧',
+    icon: '/icons xp/Windows XP Icons/Email.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -238,7 +242,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'notepad',
     title: 'Untitled - Notepad',
-    icon: '📝',
+    icon: '/icons xp/Windows XP Icons/Notepad.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -248,7 +252,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'calculator',
     title: 'Calculator',
-    icon: '🔢',
+    icon: '/icons xp/Windows XP Icons/Calculator.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -258,7 +262,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'minesweeper',
     title: 'Minesweeper',
-    icon: '💣',
+    icon: '/icons xp/Windows XP Icons/Minesweeper.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -268,7 +272,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'iexplorer',
     title: 'Internet Explorer',
-    icon: '🌐',
+    icon: '/icons xp/Windows XP Icons/Internet Explorer 6.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -278,7 +282,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'help',
     title: 'Help and Support Center',
-    icon: '❓',
+    icon: '/icons xp/Windows XP Icons/Help and Support.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -288,7 +292,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'run',
     title: 'Run',
-    icon: '▶️',
+    icon: '/icons xp/Windows XP Icons/Run.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -298,7 +302,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'recycle',
     title: 'Recycle Bin',
-    icon: '🗑️',
+    icon: '/icons xp/Windows XP Icons/Recycle Bin (empty).png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -308,7 +312,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'solitaire',
     title: 'Solitaire',
-    icon: '🃏',
+    icon: '/icons xp/Windows XP Icons/Solitaire.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -318,7 +322,7 @@ const initialWindows: WindowState[] = [
   {
     id: 'paint',
     title: 'Paint',
-    icon: '🎨',
+    icon: '/icons xp/Windows XP Icons/Paint.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -328,18 +332,17 @@ const initialWindows: WindowState[] = [
   {
     id: 'snake',
     title: 'Snake',
-    icon: '🐍',
+    icon: '/icons xp/Windows XP Icons/Game Controller.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
     position: { x: 200, y: 60 },
     size: { width: 360, height: 420 },
   },
-
   {
     id: 'dispprops',
     title: 'Display Properties',
-    icon: '🖼️',
+    icon: '/icons xp/Windows XP Icons/Display Properties.png',
     isOpen: false,
     isMinimized: false,
     zIndex: 1,
@@ -349,35 +352,33 @@ const initialWindows: WindowState[] = [
 ];
 
 const desktopIcons = [
-  { id: 'mycomputer', icon: '💻', label: 'My Computer' },
-  { id: 'about', icon: '👤', label: 'About Me' },
-  { id: 'projects', icon: '📁', label: 'My Projects' },
-  { id: 'skills', icon: '📊', label: 'Skills' },
-  { id: 'contact', icon: '📧', label: 'Contact' },
-  { id: 'iexplorer', icon: '🌐', label: 'Internet Explorer' },
-  { id: 'notepad', icon: '📝', label: 'Notepad' },
-  { id: 'calculator', icon: '🔢', label: 'Calculator' },
-  { id: 'minesweeper', icon: '💣', label: 'Minesweeper' },
-  { id: 'solitaire', icon: '🃏', label: 'Solitaire' },
-  { id: 'paint', icon: '🎨', label: 'Paint' },
-  { id: 'snake', icon: '🐍', label: 'Snake' },
-  { id: 'help', icon: '❓', label: 'Help' },
-  { id: 'recycle', icon: '🗑️', label: 'Recycle Bin' },
-
+  { id: 'mycomputer', icon: '/icons xp/Windows XP Icons/My Computer.png', label: 'My Computer' },
+  { id: 'about', icon: '/icons xp/Windows XP Icons/User Accounts.png', label: 'About Me' },
+  { id: 'projects', icon: '/icons xp/Windows XP Icons/Folder Closed.png', label: 'My Projects' },
+  { id: 'skills', icon: '/icons xp/Windows XP Icons/Performance.png', label: 'Skills' },
+  { id: 'contact', icon: '/icons xp/Windows XP Icons/Email.png', label: 'Contact' },
+  { id: 'iexplorer', icon: '/icons xp/Windows XP Icons/Internet Explorer 6.png', label: 'Internet Explorer' },
+  { id: 'notepad', icon: '/icons xp/Windows XP Icons/Notepad.png', label: 'Notepad' },
+  { id: 'calculator', icon: '/icons xp/Windows XP Icons/Calculator.png', label: 'Calculator' },
+  { id: 'minesweeper', icon: '/icons xp/Windows XP Icons/Minesweeper.png', label: 'Minesweeper' },
+  { id: 'solitaire', icon: '/icons xp/Windows XP Icons/Solitaire.png', label: 'Solitaire' },
+  { id: 'paint', icon: '/icons xp/Windows XP Icons/Paint.png', label: 'Paint' },
+  { id: 'snake', icon: '/icons xp/Windows XP Icons/Game Controller.png', label: 'Snake' },
+  { id: 'help', icon: '/icons xp/Windows XP Icons/Help and Support.png', label: 'Help' },
+  { id: 'recycle', icon: '/icons xp/Windows XP Icons/Recycle Bin (empty).png', label: 'Recycle Bin' },
 ];
 
 const menuItems = [
-  { id: 'iexplorer', title: 'Internet Explorer', icon: '🌐' },
-  { id: 'mycomputer', title: 'My Computer', icon: '💻' },
-  { id: 'about', title: 'About Me', icon: '👤' },
-  { id: 'projects', title: 'My Projects', icon: '📁' },
-  { id: 'skills', title: 'Skills', icon: '📊' },
-  { id: 'contact', title: 'Contact', icon: '📧' },
+  { id: 'iexplorer', title: 'Internet Explorer', icon: '/icons xp/Windows XP Icons/Internet Explorer 6.png' },
+  { id: 'mycomputer', title: 'My Computer', icon: '/icons xp/Windows XP Icons/My Computer.png' },
+  { id: 'about', title: 'About Me', icon: '/icons xp/Windows XP Icons/User Accounts.png' },
+  { id: 'projects', title: 'My Projects', icon: '/icons xp/Windows XP Icons/Folder Closed.png' },
+  { id: 'skills', title: 'Skills', icon: '/icons xp/Windows XP Icons/Performance.png' },
+  { id: 'contact', title: 'Contact', icon: '/icons xp/Windows XP Icons/Email.png' },
   // Apps below the divider
-  { id: 'notepad', title: 'Notepad', icon: '📝' },
-  { id: 'calculator', title: 'Calculator', icon: '🔢' },
-  { id: 'minesweeper', title: 'Minesweeper', icon: '💣' },
-
+  { id: 'notepad', title: 'Notepad', icon: '/icons xp/Windows XP Icons/Notepad.png' },
+  { id: 'calculator', title: 'Calculator', icon: '/icons xp/Windows XP Icons/Calculator.png' },
+  { id: 'minesweeper', title: 'Minesweeper', icon: '/icons xp/Windows XP Icons/Minesweeper.png' },
 ];
 
 // Grid geometry used for the free-drag / align-to-grid math.
@@ -718,7 +719,7 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
     const base = kind === 'folder' ? 'New Folder' : 'New Text Document';
     const label = n === 1 ? (kind === 'folder' ? base : `${base}.txt`) : (kind === 'folder' ? `${base} (${n})` : `${base} (${n}).txt`);
     const id = `custom-${kind}-${Date.now()}`;
-    const icon = kind === 'folder' ? '📁' : '📝';
+    const icon = kind === 'folder' ? '/icons xp/Windows XP Icons/Folder Closed.png' : '/icons xp/Windows XP Icons/TXT.png';
     setCustomIcons(prev => [...prev, { id, icon, label, kind }]);
     selectOnly(id);
     setContextMenu(null);
@@ -754,7 +755,7 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
   const getDesktopContextMenuItems = (): MenuItem[] => [
     {
       label: 'View',
-      icon: '👁️',
+      icon: '/icons xp/Windows XP Icons/Appearance.png',
       submenu: [
         { label: 'Large Icons', checked: true },
         { label: 'Tiles', disabled: true },
@@ -766,7 +767,7 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
     },
     {
       label: 'Arrange Icons By',
-      icon: '📊',
+      icon: '/icons xp/Windows XP Icons/Sort Alphabetically.png',
       submenu: [
         { label: 'Name', onClick: sortIconsByName },
         { label: 'Type', disabled: true },
@@ -784,37 +785,37 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
         },
       ],
     },
-    { label: 'Refresh', icon: '🔄', onClick: () => window.location.reload() },
+    { label: 'Refresh', icon: '/icons xp/Windows XP Icons/IE Refresh.png', onClick: () => window.location.reload() },
     { divider: true },
-    { label: 'Paste', icon: '📋', disabled: true },
+    { label: 'Paste', icon: '/icons xp/Windows XP Icons/Paste.png', disabled: true },
     { label: 'Paste Shortcut', disabled: true },
     { divider: true },
     {
       label: 'New',
-      icon: '📄',
+      icon: '/icons xp/Windows XP Icons/New Folder.png',
       submenu: [
-        { label: 'Folder', icon: '📁', onClick: () => createNewItem('folder') },
+        { label: 'Folder', icon: '/icons xp/Windows XP Icons/Folder Closed.png', onClick: () => createNewItem('folder') },
         { label: 'Shortcut', disabled: true },
-        { label: 'Text Document', icon: '📝', onClick: () => createNewItem('textfile') },
+        { label: 'Text Document', icon: '/icons xp/Windows XP Icons/TXT.png', onClick: () => createNewItem('textfile') },
       ],
     },
     { divider: true },
-    { label: 'Properties', icon: '🖼️', onClick: () => openWindow('dispprops') },
+    { label: 'Properties', icon: '/icons xp/Windows XP Icons/Display Properties.png', onClick: () => openWindow('dispprops') },
   ];
 
   const getIconContextMenuItems = (iconId: string): MenuItem[] => {
     const isCustom = customIcons.some(c => c.id === iconId);
     return [
-      { label: 'Open', icon: '📂', onClick: () => openWindow(iconId) },
+      { label: 'Open', icon: '/icons xp/Windows XP Icons/Folder Opened.png', onClick: () => openWindow(iconId) },
       { divider: true },
-      { label: 'Cut', icon: '✂️', disabled: true },
-      { label: 'Copy', icon: '📋', disabled: true },
+      { label: 'Cut', icon: '/icons xp/Windows XP Icons/Cut.png', disabled: true },
+      { label: 'Copy', icon: '/icons xp/Windows XP Icons/Copy.png', disabled: true },
       { divider: true },
       { label: 'Create Shortcut', disabled: true },
-      { label: 'Delete', icon: '🗑️', disabled: !isCustom, onClick: isCustom ? () => deleteCustomIcon(iconId) : undefined },
-      { label: 'Rename', disabled: true },
+      { label: 'Delete', icon: '/icons xp/Windows XP Icons/Delete.png', disabled: !isCustom, onClick: isCustom ? () => deleteCustomIcon(iconId) : undefined },
+      { label: 'Rename', icon: '/icons xp/Windows XP Icons/Rename.png', disabled: true },
       { divider: true },
-      { label: 'Properties', icon: '⚙️', onClick: () => openWindow(iconId) },
+      { label: 'Properties', icon: '/icons xp/Windows XP Icons/Properties.png', onClick: () => openWindow(iconId) },
     ];
   };
 

@@ -1,5 +1,7 @@
 'use client';
 
+import XPIcon from '../XPIcon';
+
 export default function RecycleBinContent() {
   const deletedItems = [
     { name: 'old_resume_v1.doc', type: 'document', date: '2024-01-15' },
@@ -9,10 +11,10 @@ export default function RecycleBinContent() {
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'document': return '📄';
-      case 'text': return '📝';
-      case 'image': return '🖼️';
-      default: return '📁';
+      case 'document': return '/icons xp/Windows XP Icons/Generic Document.png';
+      case 'text': return '/icons xp/Windows XP Icons/Generic Text Document.png';
+      case 'image': return '/icons xp/Windows XP Icons/Bitmap.png';
+      default: return '/icons xp/Windows XP Icons/Folder Closed.png';
     }
   };
 
@@ -26,7 +28,7 @@ export default function RecycleBinContent() {
         paddingBottom: '10px',
         borderBottom: '1px solid #e0e0e0'
       }}>
-        <span style={{ fontSize: '24px' }}>🗑️</span>
+        <XPIcon src="/icons xp/Windows XP Icons/Recycle Bin (empty).png" size={28} alt="Recycle Bin" />
         <div>
           <h2 style={{ margin: 0, fontSize: '14px' }}>Recycle Bin</h2>
           <p style={{ margin: '2px 0 0', color: '#666', fontSize: '10px' }}>
@@ -38,17 +40,19 @@ export default function RecycleBinContent() {
       {/* Toolbar */}
       <div style={{ 
         display: 'flex', 
-        gap: '10px', 
+        gap: '8px', 
         marginBottom: '10px',
         padding: '5px',
         background: '#f5f5f5',
         borderRadius: '2px',
         fontSize: '10px'
       }}>
-        <button className="xp-button" style={{ fontSize: '10px', padding: '2px 8px', minWidth: 'auto', minHeight: 'auto' }}>
+        <button className="xp-button" style={{ fontSize: '10px', padding: '2px 8px', minWidth: 'auto', minHeight: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <XPIcon src="/icons xp/Windows XP Icons/Delete.png" size={14} />
           Empty Recycle Bin
         </button>
-        <button className="xp-button" style={{ fontSize: '10px', padding: '2px 8px', minWidth: 'auto', minHeight: 'auto' }}>
+        <button className="xp-button" style={{ fontSize: '10px', padding: '2px 8px', minWidth: 'auto', minHeight: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <XPIcon src="/icons xp/Windows XP Icons/Restore All Items.png" size={14} />
           Restore All
         </button>
       </div>
@@ -67,7 +71,8 @@ export default function RecycleBinContent() {
           background: 'linear-gradient(180deg, #fff 0%, #eee 100%)',
           borderBottom: '1px solid #ccc',
           fontSize: '10px',
-          fontWeight: 'bold'
+          fontWeight: 'bold',
+          alignItems: 'center'
         }}>
           <span></span>
           <span>Name</span>
@@ -85,11 +90,14 @@ export default function RecycleBinContent() {
               borderBottom: '1px solid #eee',
               fontSize: '11px',
               cursor: 'pointer',
+              alignItems: 'center',
             }}
             onMouseOver={(e) => e.currentTarget.style.background = '#e8f4ff'}
             onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
           >
-            <span>{getIcon(item.type)}</span>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <XPIcon src={getIcon(item.type)} size={16} alt={item.name} />
+            </span>
             <span>{item.name}</span>
             <span style={{ color: '#666' }}>{item.date}</span>
           </div>

@@ -1,6 +1,23 @@
 'use client';
 
+import XPIcon from '../XPIcon';
+
 export default function HelpContent() {
+  const apps = [
+    { icon: '/icons xp/Windows XP Icons/My Computer.png', name: 'My Computer - System info' },
+    { icon: '/icons xp/Windows XP Icons/User Accounts.png', name: 'About Me - Profile' },
+    { icon: '/icons xp/Windows XP Icons/Folder Closed.png', name: 'My Projects - Portfolio' },
+    { icon: '/icons xp/Windows XP Icons/Performance.png', name: 'Skills - Tech stack' },
+    { icon: '/icons xp/Windows XP Icons/Email.png', name: 'Contact - Get in touch' },
+    { icon: '/icons xp/Windows XP Icons/Internet Explorer 6.png', name: 'Internet Explorer - Browse' },
+    { icon: '/icons xp/Windows XP Icons/Notepad.png', name: 'Notepad - Text editor' },
+    { icon: '/icons xp/Windows XP Icons/Calculator.png', name: 'Calculator - Math' },
+    { icon: '/icons xp/Windows XP Icons/Paint.png', name: 'Paint - Drawing app' },
+    { icon: '/icons xp/Windows XP Icons/Minesweeper.png', name: 'Minesweeper - Game' },
+    { icon: '/icons xp/Windows XP Icons/Solitaire.png', name: 'Solitaire - Card game' },
+    { icon: '/icons xp/Windows XP Icons/Game Controller.png', name: 'Snake - Classic game' },
+  ];
+
   return (
     <div>
       <div style={{ 
@@ -11,7 +28,7 @@ export default function HelpContent() {
         paddingBottom: '10px',
         borderBottom: '1px solid #e0e0e0'
       }}>
-        <span style={{ fontSize: '24px' }}>❓</span>
+        <XPIcon src="/icons xp/Windows XP Icons/Help and Support.png" size={28} alt="Help" />
         <div>
           <h2 style={{ margin: 0, fontSize: '14px' }}>Help and Support Center</h2>
           <p style={{ margin: '2px 0 0', color: '#666', fontSize: '10px' }}>
@@ -42,18 +59,12 @@ export default function HelpContent() {
       <fieldset className="xp-fieldset">
         <legend>Available Applications</legend>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '11px' }}>
-          <div>💻 My Computer - System info</div>
-          <div>👤 About Me - Profile</div>
-          <div>📁 My Projects - Portfolio</div>
-          <div>📊 Skills - Tech stack</div>
-          <div>📧 Contact - Get in touch</div>
-          <div>🌐 Internet Explorer - Browse</div>
-          <div>📝 Notepad - Text editor</div>
-          <div>🔢 Calculator - Math</div>
-          <div>🎨 Paint - Drawing app</div>
-          <div>💣 Minesweeper - Game</div>
-          <div>🃏 Solitaire - Card game</div>
-          <div>🐍 Snake - Classic game</div>
+          {apps.map((app, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <XPIcon src={app.icon} size={16} />
+              <span>{app.name}</span>
+            </div>
+          ))}
         </div>
       </fieldset>
 

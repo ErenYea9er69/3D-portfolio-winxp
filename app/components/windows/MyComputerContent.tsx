@@ -1,10 +1,12 @@
 'use client';
 
+import XPIcon from '../XPIcon';
+
 export default function MyComputerContent() {
   const drives = [
-    { name: 'Local Disk (C:)', icon: '💾', size: '∞ GB', used: '42%', type: 'System Drive' },
-    { name: 'Projects (D:)', icon: '📀', size: '7 Projects', used: '100%', type: 'Project Storage' },
-    { name: 'Skills (E:)', icon: '💿', size: '9 Skills', used: '90%', type: 'Skill Database' },
+    { name: 'Local Disk (C:)', icon: '/icons xp/Windows XP Icons/Local Disk.png', size: '∞ GB', used: '42%', type: 'System Drive' },
+    { name: 'Projects (D:)', icon: '/icons xp/Windows XP Icons/Optical Drive.png', size: '7 Projects', used: '100%', type: 'Project Storage' },
+    { name: 'Skills (E:)', icon: '/icons xp/Windows XP Icons/Audio CD.png', size: '9 Skills', used: '90%', type: 'Skill Database' },
   ];
 
   const systemInfo = [
@@ -26,7 +28,7 @@ export default function MyComputerContent() {
         paddingBottom: '10px',
         borderBottom: '1px solid #e0e0e0'
       }}>
-        <span style={{ fontSize: '24px' }}>💻</span>
+        <XPIcon src="/icons xp/Windows XP Icons/My Computer.png" size={28} alt="My Computer" />
         <div>
           <h2 style={{ margin: 0, fontSize: '14px' }}>My Computer</h2>
           <p style={{ margin: '2px 0 0', color: '#666', fontSize: '10px' }}>
@@ -53,7 +55,9 @@ export default function MyComputerContent() {
                 cursor: 'pointer',
               }}
             >
-              <span style={{ fontSize: '28px' }}>{drive.icon}</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px' }}>
+                <XPIcon src={drive.icon} size={32} alt={drive.name} />
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 'bold', fontSize: '11px' }}>{drive.name}</div>
                 <div style={{ fontSize: '10px', color: '#666' }}>{drive.type}</div>
@@ -101,14 +105,16 @@ export default function MyComputerContent() {
         <legend>Devices</legend>
         <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
           {[
-            { icon: '🖨️', name: 'Printer' },
-            { icon: '📷', name: 'Camera' },
-            { icon: '🎧', name: 'Audio' },
-            { icon: '🖱️', name: 'Mouse' },
-            { icon: '⌨️', name: 'Keyboard' },
+            { icon: '/icons xp/Windows XP Icons/Printer.png', name: 'Printer' },
+            { icon: '/icons xp/Windows XP Icons/Digital Camera.png', name: 'Camera' },
+            { icon: '/icons xp/Windows XP Icons/Audio Devices.png', name: 'Audio' },
+            { icon: '/icons xp/Windows XP Icons/Mouse.png', name: 'Mouse' },
+            { icon: '/icons xp/Windows XP Icons/Keyboard.png', name: 'Keyboard' },
           ].map(device => (
-            <div key={device.name} style={{ textAlign: 'center', fontSize: '10px' }}>
-              <div style={{ fontSize: '24px', marginBottom: '2px' }}>{device.icon}</div>
+            <div key={device.name} style={{ textAlign: 'center', fontSize: '10px', minWidth: '50px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '30px', marginBottom: '2px' }}>
+                <XPIcon src={device.icon} size={26} alt={device.name} />
+              </div>
               {device.name}
             </div>
           ))}

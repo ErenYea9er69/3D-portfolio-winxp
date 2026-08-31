@@ -1,5 +1,7 @@
 'use client';
 
+import XPIcon from '../XPIcon';
+
 const techStack = [
   { name: 'React', icon: '⚛️', color: '#61dafb' },
   { name: 'Next.js', icon: '▲', color: '#000' },
@@ -66,9 +68,8 @@ export default function SkillsContent() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '20px',
         }}>
-          💡
+          <XPIcon src="/icons xp/Windows XP Icons/Performance.png" size={30} alt="Tech Stack" />
         </div>
         <div>
           <h2 style={{ margin: 0, fontSize: '16px', color: '#0a246a' }}>Tech Stack</h2>

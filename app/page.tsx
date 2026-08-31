@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import BootScreen from './components/BootScreen';
 import Desktop from './components/Desktop';
+import XPIcon from './components/XPIcon';
 
 // Log Off Screen - shows "Logging off..." then welcome screen
 function LogOffScreen({ onComplete }: { onComplete: () => void }) {
@@ -112,15 +113,16 @@ function WelcomeScreen({ onLogin }: { onLogin: () => void }) {
         <div style={{
           width: '48px',
           height: '48px',
-          background: 'linear-gradient(180deg, #87ceeb 0%, #4169e1 100%)',
+          background: '#ffffff',
           borderRadius: '4px',
           border: '2px solid rgba(255,255,255,0.8)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '24px',
+          overflow: 'hidden',
+          padding: '2px',
         }}>
-          👤
+          <XPIcon src="/icons xp/Windows XP Icons/User Accounts.png" size={38} alt="User Avatar" />
         </div>
         <div>
           <div style={{ color: 'white', fontSize: '14px', fontWeight: 'bold' }}>

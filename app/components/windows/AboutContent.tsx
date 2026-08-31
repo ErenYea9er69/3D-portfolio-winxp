@@ -1,5 +1,7 @@
 'use client';
 
+import XPIcon from '../XPIcon';
+
 export default function AboutContent() {
   return (
     <div style={{ maxWidth: '420px' }}>
@@ -22,12 +24,13 @@ export default function AboutContent() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '40px',
           flexShrink: 0,
           border: '3px solid #fff',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+          overflow: 'hidden',
+          padding: '6px',
         }}>
-          👨‍💻
+          <XPIcon src="/icons xp/Windows XP Icons/User Accounts.png" size={54} alt="Prasenjit Nayak" />
         </div>
         <div style={{ flex: 1 }}>
           <h2 style={{ margin: '0 0 4px 0', fontSize: '18px', color: '#0a246a', fontWeight: 'bold' }}>
