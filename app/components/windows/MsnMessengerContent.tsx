@@ -145,10 +145,10 @@ function getBotReply(msg: string, buddyId: string): string {
 
   if (buddyId === 'clippy') {
     if (lower.includes('project') || lower.includes('work')) {
-      return '📎 It looks like you want to see projects! You can check out "My Projects" folder on the desktop or ask Prasenjit directly.';
+      return '📎 It looks like you want to see projects! You can check out "My Projects" folder on the desktop or ask Rayen directly.';
     }
     if (lower.includes('hire') || lower.includes('contact')) {
-      return '📎 It looks like you want to get in touch! Use the "Contact Me" program or email Prasenjit directly.';
+      return '📎 It looks like you want to get in touch! Use the "Contact Me" program or email Rayen directly.';
     }
     return '📎 Would you like me to write a formal letter for you, or perhaps help you configure Windows XP?';
   }

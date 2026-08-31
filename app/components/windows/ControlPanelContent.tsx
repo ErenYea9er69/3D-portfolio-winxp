@@ -629,7 +629,7 @@ export default function ControlPanelContent({ onOpenApp }: ControlPanelContentPr
                 <tbody>
                   <tr>
                     <td style={{ padding: '4px 0', color: '#666', width: '120px' }}>Computer:</td>
-                    <td style={{ fontWeight: 'bold' }}>PRASENJIT-WORKSTATION</td>
+                    <td style={{ fontWeight: 'bold' }}>RAYEN-WORKSTATION</td>
                   </tr>
                   <tr>
                     <td style={{ padding: '4px 0', color: '#666' }}>Processor:</td>

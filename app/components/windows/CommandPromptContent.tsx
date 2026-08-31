@@ -87,7 +87,7 @@ export default function CommandPromptContent({ onOpenApp }: CommandPromptContent
     if (!trimmed) {
       setLines(prev => [
         ...prev,
-        { id: Date.now(), text: 'C:\\Documents and Settings\\Prasenjit> ', type: 'input' },
+        { id: Date.now(), text: 'C:\\Documents and Settings\\Rayen> ', type: 'input' },
       ]);
       return;
     }
@@ -98,7 +98,7 @@ export default function CommandPromptContent({ onOpenApp }: CommandPromptContent
 
     const fullInputLine: HistoryLine = {
       id: Date.now(),
-      text: `C:\\Documents and Settings\\Prasenjit> ${trimmed}`,
+      text: `C:\\Documents and Settings\\Rayen> ${trimmed}`,
       type: 'input',
     };
 
@@ -140,7 +140,7 @@ export default function CommandPromptContent({ onOpenApp }: CommandPromptContent
         return;
 
       case 'whoami':
-        outputLines.push('PRASENJIT-PC\\Prasenjit (Administrator)');
+        outputLines.push('RAYEN-PC\\Rayen (Administrator)');
         break;
 
       case 'about':
@@ -187,7 +187,7 @@ export default function CommandPromptContent({ onOpenApp }: CommandPromptContent
           ' Volume in drive C has no label.',
           ' Volume Serial Number is 4C28-91FA',
           '',
-          ' Directory of C:\\Documents and Settings\\Prasenjit',
+          ' Directory of C:\\Documents and Settings\\Rayen',
           '',
           '08/31/2026  01:30 AM    <DIR>          .',
           '08/31/2026  01:30 AM    <DIR>          ..',
@@ -235,7 +235,7 @@ export default function CommandPromptContent({ onOpenApp }: CommandPromptContent
 
       case 'systeminfo':
         outputLines.push(
-          'Host Name:                 PRASENJIT-PC',
+          'Host Name:                 RAYEN-PC',
           'OS Name:                   Microsoft Windows XP Professional',
           'OS Version:                5.1.2600 Service Pack 3 Build 2600',
           'System Manufacturer:       Creative Frameworks Inc.',
@@ -437,7 +437,7 @@ export default function CommandPromptContent({ onOpenApp }: CommandPromptContent
       {/* Active Command Input Line */}
       <div style={{ display: 'flex', alignItems: 'center', marginTop: '2px' }}>
         <span style={{ color: '#ffff88', whiteSpace: 'nowrap', marginRight: '6px' }}>
-          C:\Documents and Settings\Prasenjit&gt;
+          C:\Documents and Settings\Rayen&gt;
         </span>
         <input
           ref={inputRef}

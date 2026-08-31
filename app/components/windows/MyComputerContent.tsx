@@ -10,7 +10,7 @@ export default function MyComputerContent() {
   ];
 
   const systemInfo = [
-    { label: 'Computer Name', value: 'PRASENJIT-PC' },
+    { label: 'Computer Name', value: 'RAYEN-PC' },
     { label: 'Operating System', value: 'Windows XP Portfolio Edition' },
     { label: 'Processor', value: 'Brain™ Core i∞ @ Max GHz' },
     { label: 'RAM', value: '∞ GB (Coffee Powered)' },

@@ -39,8 +39,8 @@ const DEFAULT_PROCESSES: ProcessItem[] = [
   { id: 'svchost2', name: 'svchost.exe', pid: 824, cpu: 0, cpuTime: '0:00:08', memUsage: 5140, user: 'NETWORK SERVICE' },
   { id: 'svchost3', name: 'svchost.exe', pid: 912, cpu: 0, cpuTime: '0:00:02', memUsage: 3960, user: 'LOCAL SERVICE' },
   { id: 'spoolsv', name: 'spoolsv.exe', pid: 1044, cpu: 0, cpuTime: '0:00:01', memUsage: 4720, user: 'SYSTEM' },
-  { id: 'explorer', name: 'explorer.exe', pid: 1420, cpu: 1, cpuTime: '0:02:45', memUsage: 28650, user: 'Prasenjit' },
-  { id: 'taskmgr', name: 'taskmgr.exe', pid: 2048, cpu: 1, cpuTime: '0:00:02', memUsage: 4280, user: 'Prasenjit' },
+  { id: 'explorer', name: 'explorer.exe', pid: 1420, cpu: 1, cpuTime: '0:02:45', memUsage: 28650, user: 'Rayen' },
+  { id: 'taskmgr', name: 'taskmgr.exe', pid: 2048, cpu: 1, cpuTime: '0:00:02', memUsage: 4280, user: 'Rayen' },
   { id: 'alg', name: 'alg.exe', pid: 2196, cpu: 0, cpuTime: '0:00:01', memUsage: 1480, user: 'LOCAL SERVICE' },
 ];
 
@@ -90,7 +90,7 @@ export default function TaskManagerContent({
         cpu: Math.floor(Math.random() * 2),
         cpuTime: '0:00:08',
         memUsage: 8000 + (w.id.length * 1420),
-        user: 'Prasenjit',
+        user: 'Rayen',
         windowId: w.id,
       };
     });
