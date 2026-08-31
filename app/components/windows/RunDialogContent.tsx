@@ -34,6 +34,20 @@ export default function RunDialogContent({ onOpenApp }: RunDialogContentProps) {
     'projects': 'projects',
     'skills': 'skills',
     'contact': 'contact',
+    'cmd': 'cmd',
+    'cmd.exe': 'cmd',
+    'command': 'cmd',
+    'prompt': 'cmd',
+    'terminal': 'cmd',
+    'wmp': 'mediaplayer',
+    'wmplayer': 'mediaplayer',
+    'wmplayer.exe': 'mediaplayer',
+    'media': 'mediaplayer',
+    'music': 'mediaplayer',
+    'control': 'controlpanel',
+    'controlpanel': 'controlpanel',
+    'control panel': 'controlpanel',
+    'settings': 'controlpanel',
   };
 
   const handleRun = () => {

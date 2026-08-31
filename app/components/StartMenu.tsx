@@ -52,6 +52,9 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
     { id: 'projects', title: 'My Projects', icon: '/icons xp/Windows XP Icons/Folder Closed.png' },
     { id: 'skills', title: 'Skills', icon: '/icons xp/Windows XP Icons/Performance.png' },
     { id: 'contact', title: 'Contact', icon: '/icons xp/Windows XP Icons/Email.png' },
+    { id: 'controlpanel', title: 'Control Panel', icon: '/icons xp/Windows XP Icons/Control Panel.png' },
+    { id: 'mediaplayer', title: 'Windows Media Player', icon: '/icons xp/Windows XP Icons/Windows Media Player 10.png' },
+    { id: 'cmd', title: 'Command Prompt', icon: '/icons xp/Windows XP Icons/Command Prompt.png' },
     { id: 'notepad', title: 'Notepad', icon: '/icons xp/Windows XP Icons/Notepad.png' },
     { id: 'calculator', title: 'Calculator', icon: '/icons xp/Windows XP Icons/Calculator.png' },
     { id: 'minesweeper', title: 'Minesweeper', icon: '/icons xp/Windows XP Icons/Minesweeper.png' },
@@ -181,6 +184,12 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
                 <div style={{ fontSize: '10px', color: '#666', padding: '4px 8px', fontWeight: 'bold', borderTop: '1px solid #ccc', marginTop: '4px' }}>
                   Accessories
                 </div>
+                <div className="xp-start-menu-item" onClick={() => handleItemClick('cmd')}>
+                  <div className="xp-start-menu-item-icon" style={{ width: '18px', height: '18px' }}>
+                    <XPIcon src="/icons xp/Windows XP Icons/Command Prompt.png" size={16} alt="Command Prompt" />
+                  </div>
+                  <span style={{ fontSize: '11px' }}>Command Prompt</span>
+                </div>
                 <div className="xp-start-menu-item" onClick={() => handleItemClick('notepad')}>
                   <div className="xp-start-menu-item-icon" style={{ width: '18px', height: '18px' }}>
                     <XPIcon src="/icons xp/Windows XP Icons/Notepad.png" size={16} alt="Notepad" />
@@ -192,6 +201,15 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
                     <XPIcon src="/icons xp/Windows XP Icons/Calculator.png" size={16} alt="Calculator" />
                   </div>
                   <span style={{ fontSize: '11px' }}>Calculator</span>
+                </div>
+                <div style={{ fontSize: '10px', color: '#666', padding: '4px 8px', fontWeight: 'bold', borderTop: '1px solid #ccc', marginTop: '4px' }}>
+                  Entertainment & Media
+                </div>
+                <div className="xp-start-menu-item" onClick={() => handleItemClick('mediaplayer')}>
+                  <div className="xp-start-menu-item-icon" style={{ width: '18px', height: '18px' }}>
+                    <XPIcon src="/icons xp/Windows XP Icons/Windows Media Player 10.png" size={16} alt="Media Player" />
+                  </div>
+                  <span style={{ fontSize: '11px' }}>Windows Media Player</span>
                 </div>
                 <div style={{ fontSize: '10px', color: '#666', padding: '4px 8px', fontWeight: 'bold', borderTop: '1px solid #ccc', marginTop: '4px' }}>
                   Games
@@ -255,6 +273,15 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
                 <XPIcon src="/icons xp/Windows XP Icons/Performance.png" size={20} alt="My Skills" />
               </div>
               <span style={{ fontSize: '11px' }}>My Skills</span>
+            </div>
+            <div 
+              className="xp-start-menu-item"
+              onClick={() => handleItemClick('controlpanel')}
+            >
+              <div className="xp-start-menu-item-icon" style={{ width: '22px', height: '22px' }}>
+                <XPIcon src="/icons xp/Windows XP Icons/Control Panel.png" size={20} alt="Control Panel" />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Control Panel</span>
             </div>
             
             <div style={{ 
