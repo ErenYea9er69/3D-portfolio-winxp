@@ -182,9 +182,9 @@ async function init() {
       education, experience, achievements, social_links, resume_url
     ) VALUES (
       'main',
-      'Prasenjit Nayak',
+      'Rayen Ben Aissa',
       'Full Stack Developer',
-      'Odisha, India',
+      'Tunisia',
       'I have learned most of my lessons the hard way. Currently freelancing and collaborating with new people on exciting projects. I love playing video games, sharing thoughts on tech, and touch typing in my free time.',
       '/icons xp/Windows XP Icons/User Accounts.png',
       'Available for work',
@@ -494,7 +494,7 @@ async function init() {
   const buddiesData = [
     {
       id: 'prasenjit',
-      name: 'Prasenjit Nayak (Dev)',
+      name: 'Rayen Ben Aissa (Dev)',
       status: 'online',
       status_text: '⚡ Building fast web apps | Available for hire!',
       avatar: '/icons xp/Windows XP Icons/User Accounts.png',
@@ -540,7 +540,7 @@ async function init() {
     {
       id: 'welcome-notepad',
       title: 'Welcome.txt',
-      content: `Welcome to Prasenjit Nayak's Windows XP Portfolio!
+      content: `Welcome to Rayen Ben Aissa's Windows XP Portfolio!
 
 Everything you see is powered by Next.js and backed live by Neon PostgreSQL.
 Feel free to create new text files, save them to the cloud database, or explore the applications!
@@ -552,8 +552,8 @@ GitHub: https://github.com/StarKnightt`,
     {
       id: 'welcome-wordpad',
       title: 'Resume_Overview.rtf',
-      content: `PRASENJIT NAYAK - FULL STACK DEVELOPER
-Location: Odisha, India
+      content: `RAYEN BEN AISSA - FULL STACK DEVELOPER
+Location: Tunisia
 Education: B.Tech in CS & IT (Trident Academy of Technology)
 
 Key Highlights:

@@ -16,9 +16,9 @@ import type {
 // Fallback defaults for instant 0ms initial render
 const DEFAULT_PROFILE: PortfolioProfile = {
   id: 'main',
-  name: 'Prasenjit Nayak',
+  name: 'Rayen Ben Aissa',
   title: 'Full Stack Developer',
-  location: 'Odisha, India',
+  location: 'Tunisia',
   bio: "I've learned most of my lessons the hard way. Currently freelancing and collaborating with new people on exciting projects. I love playing video games, sharing thoughts on tech, and touch typing in my free time.",
   avatar_url: '/icons xp/Windows XP Icons/User Accounts.png',
   status: 'Available for work',

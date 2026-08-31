@@ -43,7 +43,7 @@ export default function HelpContent() {
       <fieldset className="xp-fieldset">
         <legend>Welcome to Windows XP Portfolio!</legend>
         <p style={{ fontSize: '11px', lineHeight: '1.6', margin: '5px 0' }}>
-          This is a Windows XP-style portfolio website created by Prasenjit Nayak. 
+          This is a Windows XP-style portfolio website created by Rayen Ben Aissa. 
           It recreates the classic Windows XP experience in your browser.
         </p>
       </fieldset>

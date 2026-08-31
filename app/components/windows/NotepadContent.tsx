@@ -17,9 +17,9 @@ This is a live cloud text editor connected to Neon PostgreSQL.
 You can create notes, save them to the cloud database, or open existing notes from the File menu!
 
 --------------------
-Prasenjit Nayak
+Rayen Ben Aissa
 Full Stack Developer
-Odisha, India
+Tunisia
 --------------------
 
 Thanks for visiting my portfolio!`

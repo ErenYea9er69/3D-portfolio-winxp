@@ -126,7 +126,7 @@ function WelcomeScreen({ onLogin }: { onLogin: () => void }) {
         </div>
         <div>
           <div style={{ color: 'white', fontSize: '14px', fontWeight: 'bold' }}>
-            Prasenjit Nayak
+            Rayen Ben Aissa
           </div>
           <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '11px', marginTop: '2px' }}>
             Click to log in

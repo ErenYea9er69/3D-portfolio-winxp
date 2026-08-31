@@ -145,8 +145,8 @@ export default function CommandPromptContent({ onOpenApp }: CommandPromptContent
 
       case 'about':
         outputLines.push(
-          'Prasenjit Nayak - Full Stack Developer',
-          'Location: Odisha, India',
+          'Rayen Ben Aissa - Full Stack Developer',
+          'Location: Tunisia',
           'Bio: Passionate about building modern, delightful web applications, retro UI experiences, and developer tools.',
           'Education: B.Tech in CS & IT'
         );

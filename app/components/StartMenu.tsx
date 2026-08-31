@@ -89,7 +89,7 @@ export default function StartMenu({ isOpen, onClose, onItemClick, onLogOff, onSh
           <div className="xp-start-menu-avatar" style={{ overflow: 'hidden', padding: '2px', background: 'white' }}>
             <XPIcon src="/icons xp/Windows XP Icons/User Accounts.png" size={38} alt="User Avatar" />
           </div>
-          <span className="xp-start-menu-user">Prasenjit Nayak</span>
+          <span className="xp-start-menu-user">Rayen Ben Aissa</span>
         </div>
 
         {/* Body */}

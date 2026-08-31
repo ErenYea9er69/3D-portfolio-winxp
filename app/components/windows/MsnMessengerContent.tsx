@@ -23,7 +23,7 @@ interface Buddy {
 const BUDDIES: Buddy[] = [
   {
     id: 'prasenjit',
-    name: 'Prasenjit Nayak (Dev)',
+    name: 'Rayen Ben Aissa (Dev)',
     status: 'online',
     statusText: '⚡ Building fast web apps | Available for hire!',
     avatar: '/icons xp/Windows XP Icons/User Accounts.png',
@@ -200,7 +200,7 @@ export default function MsnMessengerContent() {
       {
         id: 'msg-1',
         sender: 'bot',
-        senderName: 'Prasenjit Nayak (Dev)',
+        senderName: 'Rayen Ben Aissa (Dev)',
         text: 'Hey! Welcome to MSN Messenger. What would you like to know about my work, skills, or projects? 😊',
         time: '12:00 PM',
       },
@@ -379,7 +379,7 @@ export default function MsnMessengerContent() {
 
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontWeight: 'bold', color: '#103875' }}>Prasenjit Nayak</span>
+            <span style={{ fontWeight: 'bold', color: '#103875' }}>Rayen Ben Aissa</span>
             <select
               value={myStatus}
               onChange={(e) => setMyStatus(e.target.value)}
