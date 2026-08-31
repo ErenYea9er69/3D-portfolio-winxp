@@ -529,19 +529,71 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
   const [shutdownState, setShutdownState] = useState<'none' | 'shuttingdown' | 'restarting'>('none');
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; type: 'desktop' | 'icon'; iconId?: string } | null>(null);
 
-  // Desktop background / Display Properties
-  const [wallpaper, setWallpaper] = useState('bliss');
+  // Desktop background / Display Properties with localStorage persistence
+  const [wallpaper, setWallpaper] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('xp_wallpaper') || 'bliss';
+    }
+    return 'bliss';
+  });
+
+  const handleSetWallpaper = (wId: string) => {
+    setWallpaper(wId);
+    try { localStorage.setItem('xp_wallpaper', wId); } catch { /* ignore */ }
+  };
 
   // User-created desktop items (New > Folder / New > Text Document)
   interface CustomIcon { id: string; icon: string; label: string; kind: 'folder' | 'textfile' }
-  const [customIcons, setCustomIcons] = useState<CustomIcon[]>([]);
+  const [customIcons, setCustomIcons] = useState<CustomIcon[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('xp_custom_icons');
+        if (saved) return JSON.parse(saved);
+      } catch { /* ignore */ }
+    }
+    return [];
+  });
   const newItemCounter = useRef({ folder: 0, textfile: 0 });
   const allDesktopIcons = [...desktopIcons, ...customIcons];
 
-  // Icon arrangement state
-  const [autoArrange, setAutoArrange] = useState(true);
+  // Save custom icons to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('xp_custom_icons', JSON.stringify(customIcons));
+    } catch { /* ignore */ }
+  }, [customIcons]);
+
+  // Icon arrangement state with localStorage persistence
+  const [autoArrange, setAutoArrange] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('xp_auto_arrange');
+      if (saved !== null) return saved === 'true';
+    }
+    return true;
+  });
   const [alignToGrid, setAlignToGrid] = useState(true);
-  const [freePositions, setFreePositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [freePositions, setFreePositions] = useState<Record<string, { x: number; y: number }>>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('xp_free_positions');
+        if (saved) return JSON.parse(saved);
+      } catch { /* ignore */ }
+    }
+    return {};
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('xp_auto_arrange', String(autoArrange));
+    } catch { /* ignore */ }
+  }, [autoArrange]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('xp_free_positions', JSON.stringify(freePositions));
+    } catch { /* ignore */ }
+  }, [freePositions]);
+
   const [draggingIcon, setDraggingIcon] = useState<string | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
 
@@ -1021,7 +1073,7 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
           <DisplayPropertiesContent
             wallpapers={WALLPAPERS}
             currentWallpaper={wallpaper}
-            onApply={(wallpaperId) => setWallpaper(wallpaperId)}
+            onApply={(wallpaperId) => handleSetWallpaper(wallpaperId)}
           />
         );
       default: {

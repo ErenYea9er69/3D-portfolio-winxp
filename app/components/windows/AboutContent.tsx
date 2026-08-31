@@ -1,13 +1,56 @@
 'use client';
 
+import { useState } from 'react';
 import XPIcon from '../XPIcon';
 import { usePortfolioData } from '@/app/lib/usePortfolioData';
 
 export default function AboutContent() {
-  const { profile, isDbConnected } = usePortfolioData();
+  const { profile, updateProfile, isDbConnected } = usePortfolioData();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: profile.name,
+    title: profile.title,
+    location: profile.location,
+    bio: profile.bio,
+    status: profile.status,
+  });
+
+  const handleOpenEdit = () => {
+    setFormData({
+      name: profile.name,
+      title: profile.title,
+      location: profile.location,
+      bio: profile.bio,
+      status: profile.status,
+    });
+    setIsEditing(true);
+    setSaveSuccess(false);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      const res = await updateProfile(formData);
+      if (res.success) {
+        setSaveSuccess(true);
+        setTimeout(() => {
+          setIsEditing(false);
+          setSaveSuccess(false);
+        }, 1200);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <div style={{ maxWidth: '420px' }}>
+    <div style={{ maxWidth: '420px', position: 'relative' }}>
       {/* Profile Header */}
       <div style={{ 
         display: 'flex', 
@@ -41,11 +84,21 @@ export default function AboutContent() {
             <h2 style={{ margin: '0 0 4px 0', fontSize: '18px', color: '#0a246a', fontWeight: 'bold' }}>
               {profile.name}
             </h2>
-            {isDbConnected && (
-              <span style={{ fontSize: '8px', background: '#e8f5e9', color: '#2e7d32', padding: '1px 5px', borderRadius: '4px', border: '1px solid #a5d6a7' }}>
-                Neon DB
-              </span>
-            )}
+            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <button
+                className="xp-button"
+                onClick={handleOpenEdit}
+                style={{ fontSize: '9px', padding: '1px 6px' }}
+                title="Edit profile in Neon DB"
+              >
+                ✏️ Edit Info
+              </button>
+              {isDbConnected && (
+                <span style={{ fontSize: '8px', background: '#e8f5e9', color: '#2e7d32', padding: '1px 5px', borderRadius: '4px', border: '1px solid #a5d6a7' }}>
+                  Neon DB
+                </span>
+              )}
+            </div>
           </div>
           <p style={{ margin: 0, color: '#0078d4', fontSize: '12px', fontWeight: 500 }}>
             {profile.title}
@@ -76,6 +129,156 @@ export default function AboutContent() {
         </div>
       </div>
 
+      {/* Edit Profile Modal Dialog */}
+      {isEditing && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <div style={{
+            width: '380px',
+            background: '#ece9d8',
+            border: '2px solid #0055ea',
+            borderRadius: '6px 6px 0 0',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
+            overflow: 'hidden',
+          }}>
+            {/* Modal Title bar */}
+            <div style={{
+              background: 'linear-gradient(180deg, #0058ee 0%, #3593ff 4%, #288eff 6%, #0055ea 10%, #0055ea 90%, #0040b8 100%)',
+              padding: '4px 8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '12px',
+            }}>
+              <span>Edit Profile & Location (Neon PostgreSQL)</span>
+              <button
+                onClick={() => setIsEditing(false)}
+                style={{
+                  background: '#d13824',
+                  border: '1px solid #fff',
+                  color: 'white',
+                  borderRadius: '3px',
+                  width: '18px',
+                  height: '18px',
+                  lineHeight: '14px',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSave} style={{ padding: '12px' }}>
+              <div style={{ marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '2px' }}>
+                  Full Name:
+                </label>
+                <input
+                  type="text"
+                  className="xp-input"
+                  style={{ width: '100%' }}
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '2px' }}>
+                  Title / Profession:
+                </label>
+                <input
+                  type="text"
+                  className="xp-input"
+                  style={{ width: '100%' }}
+                  value={formData.title}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '2px' }}>
+                  Location / Place of Work:
+                </label>
+                <input
+                  type="text"
+                  className="xp-input"
+                  style={{ width: '100%' }}
+                  value={formData.location}
+                  onChange={e => setFormData({ ...formData, location: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '2px' }}>
+                  Status:
+                </label>
+                <input
+                  type="text"
+                  className="xp-input"
+                  style={{ width: '100%' }}
+                  value={formData.status}
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '2px' }}>
+                  Biography:
+                </label>
+                <textarea
+                  className="xp-textarea"
+                  style={{ width: '100%', height: '60px' }}
+                  value={formData.bio}
+                  onChange={e => setFormData({ ...formData, bio: e.target.value })}
+                  required
+                />
+              </div>
+
+              {saveSuccess && (
+                <div style={{ marginBottom: '10px', color: '#155724', background: '#d4edda', padding: '4px', borderRadius: '4px', fontSize: '11px', textAlign: 'center' }}>
+                  ✔ Saved to Neon Database successfully!
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="xp-button"
+                  onClick={() => setIsEditing(false)}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="xp-button"
+                  style={{ fontWeight: 'bold' }}
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving to DB...' : '💾 Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Bio */}
       <div style={{ 
         fontSize: '11px', 
@@ -101,7 +304,7 @@ export default function AboutContent() {
             {profile.education?.[0]?.title || 'B.Tech in CS & IT'}
           </div>
           <div style={{ fontSize: '10px', color: '#666' }}>
-            {profile.education?.[0]?.subtitle || 'Trident Academy of Technology'}
+            {profile.education?.[0]?.subtitle || 'University Degree'}
           </div>
         </div>
         <div style={{

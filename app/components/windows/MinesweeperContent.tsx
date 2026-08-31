@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 const ROWS = 9;
 const COLS = 9;
@@ -13,9 +13,8 @@ type Cell = {
   neighborMines: number;
 };
 
-function createBoard(): Cell[][] {
-  // Create empty board
-  const board: Cell[][] = Array(ROWS).fill(null).map(() =>
+function createEmptyBoard(): Cell[][] {
+  return Array(ROWS).fill(null).map(() =>
     Array(COLS).fill(null).map(() => ({
       isMine: false,
       isRevealed: false,
@@ -23,13 +22,15 @@ function createBoard(): Cell[][] {
       neighborMines: 0,
     }))
   );
+}
 
-  // Place mines randomly
+function populateMines(initialBoard: Cell[][], safeRow: number, safeCol: number): Cell[][] {
+  const board = initialBoard.map(r => r.map(c => ({ ...c })));
   let minesPlaced = 0;
   while (minesPlaced < MINES) {
     const row = Math.floor(Math.random() * ROWS);
     const col = Math.floor(Math.random() * COLS);
-    if (!board[row][col].isMine) {
+    if (!board[row][col].isMine && !(row === safeRow && col === safeCol)) {
       board[row][col].isMine = true;
       minesPlaced++;
     }
@@ -53,30 +54,51 @@ function createBoard(): Cell[][] {
       }
     }
   }
-
   return board;
 }
 
 export default function MinesweeperContent() {
-  const [board, setBoard] = useState<Cell[][]>(createBoard);
+  const [board, setBoard] = useState<Cell[][]>(createEmptyBoard);
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
   const [flagsLeft, setFlagsLeft] = useState(MINES);
+  const [seconds, setSeconds] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const resetGame = useCallback(() => {
-    setBoard(createBoard());
+    if (timerRef.current) clearInterval(timerRef.current);
+    setBoard(createEmptyBoard());
     setGameOver(false);
     setGameWon(false);
     setFlagsLeft(MINES);
+    setSeconds(0);
+    setGameStarted(false);
   }, []);
+
+  useEffect(() => {
+    if (gameStarted && !gameOver && !gameWon) {
+      timerRef.current = setInterval(() => {
+        setSeconds(s => Math.min(999, s + 1));
+      }, 1000);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [gameStarted, gameOver, gameWon]);
 
   const revealCell = (row: number, col: number) => {
     if (gameOver || gameWon || board[row][col].isRevealed || board[row][col].isFlagged) return;
 
-    const newBoard = board.map(r => r.map(c => ({ ...c })));
+    let activeBoard = board;
+    if (!gameStarted) {
+      setGameStarted(true);
+      activeBoard = populateMines(board, row, col);
+    }
+
+    const newBoard = activeBoard.map(r => r.map(c => ({ ...c })));
 
     if (newBoard[row][col].isMine) {
-      // Game over - reveal all mines
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
           if (newBoard[r][c].isMine) {
@@ -89,7 +111,6 @@ export default function MinesweeperContent() {
       return;
     }
 
-    // Flood fill reveal
     const reveal = (r: number, c: number) => {
       if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
       if (newBoard[r][c].isRevealed || newBoard[r][c].isFlagged || newBoard[r][c].isMine) return;
@@ -108,7 +129,6 @@ export default function MinesweeperContent() {
     reveal(row, col);
     setBoard(newBoard);
 
-    // Check win condition
     let unrevealedSafe = 0;
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
@@ -146,6 +166,7 @@ export default function MinesweeperContent() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      userSelect: 'none',
     }}>
       {/* Header */}
       <div style={{
@@ -159,6 +180,7 @@ export default function MinesweeperContent() {
         border: '2px solid',
         borderColor: '#808080 #fff #fff #808080',
       }}>
+        {/* Flags count LCD */}
         <div style={{
           background: '#000',
           color: '#ff0000',
@@ -166,9 +188,12 @@ export default function MinesweeperContent() {
           fontFamily: 'monospace',
           fontSize: '18px',
           fontWeight: 'bold',
+          letterSpacing: '1px',
         }}>
-          {String(flagsLeft).padStart(3, '0')}
+          {String(Math.max(0, flagsLeft)).padStart(3, '0')}
         </div>
+
+        {/* Smiley Reset Button */}
         <button
           onClick={resetGame}
           style={{
@@ -179,10 +204,16 @@ export default function MinesweeperContent() {
             background: '#c0c0c0',
             border: '2px solid',
             borderColor: '#fff #808080 #808080 #fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 0,
           }}
         >
           {gameOver ? '😵' : gameWon ? '😎' : '🙂'}
         </button>
+
+        {/* Timer LCD */}
         <div style={{
           background: '#000',
           color: '#ff0000',
@@ -190,8 +221,9 @@ export default function MinesweeperContent() {
           fontFamily: 'monospace',
           fontSize: '18px',
           fontWeight: 'bold',
+          letterSpacing: '1px',
         }}>
-          000
+          {String(seconds).padStart(3, '0')}
         </div>
       </div>
 
@@ -214,16 +246,17 @@ export default function MinesweeperContent() {
                 width: '18px',
                 height: '18px',
                 padding: 0,
-                border: cell.isRevealed ? '1px solid #808080' : '2px solid',
+                border: cell.isRevealed ? '1px solid #7b7b7b' : '2px solid',
                 borderColor: cell.isRevealed ? undefined : '#fff #808080 #808080 #fff',
-                background: cell.isRevealed ? '#c0c0c0' : '#c0c0c0',
-                cursor: 'pointer',
+                background: cell.isRevealed ? (cell.isMine ? '#ff4d4d' : '#c0c0c0') : '#c0c0c0',
+                cursor: cell.isRevealed ? 'default' : 'pointer',
                 fontSize: '12px',
                 fontWeight: 'bold',
                 color: getNumberColor(cell.neighborMines),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                boxSizing: 'border-box',
               }}
             >
               {cell.isRevealed
@@ -245,17 +278,19 @@ export default function MinesweeperContent() {
         <div style={{
           marginTop: '10px',
           padding: '4px 12px',
-          background: gameWon ? '#90EE90' : '#ffcccc',
+          background: gameWon ? '#d4edda' : '#f8d7da',
           border: '1px solid',
-          borderColor: gameWon ? '#008000' : '#ff0000',
-          fontSize: '12px',
+          borderColor: gameWon ? '#28a745' : '#dc3545',
+          color: gameWon ? '#155724' : '#721c24',
+          fontSize: '11px',
           fontWeight: 'bold',
+          borderRadius: '3px',
         }}>
-          {gameWon ? '🎉 You Win!' : '💥 Game Over!'}
+          {gameWon ? '🎉 You Win! Great job!' : '💥 Boom! Click 🙂 to try again'}
         </div>
       )}
 
-      <div style={{ marginTop: '8px', fontSize: '9px', color: '#666' }}>
+      <div style={{ marginTop: '8px', fontSize: '9px', color: '#666', textAlign: 'center' }}>
         Left-click to reveal • Right-click to flag
       </div>
     </div>

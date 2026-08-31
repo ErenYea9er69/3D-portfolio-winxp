@@ -6,11 +6,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 const TABLE_W = 280;
 const TABLE_H = 520;
 const BALL_R = 6;
-const GRAVITY = 0.15;
-const FRICTION = 0.998;
-const FLIPPER_LEN = 44;
+const GRAVITY = 0.16;
+const FRICTION = 0.996;
+const FLIPPER_LEN = 46;
 const FLIPPER_W = 8;
-const PLUNGER_W = 18;
 const PLUNGER_MAX = 80;
 
 interface Bumper { x: number; y: number; r: number; score: number; flash: number }
@@ -39,10 +38,15 @@ export default function PinballContent() {
   const [score, setScore] = useState(0);
   const [balls, setBalls] = useState(3);
   const [gameState, setGameState] = useState<'ready' | 'playing' | 'launching' | 'gameover'>('ready');
-  const [highScore, setHighScore] = useState(0);
+  const [highScore, setHighScore] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return Number(localStorage.getItem('xp_pinball_hi') || '0');
+    }
+    return 0;
+  });
 
   const state = useRef({
-    ball: { x: TABLE_W - 18, y: TABLE_H - 100, vx: 0, vy: 0 },
+    ball: { x: TABLE_W - 18, y: TABLE_H - 90, vx: 0, vy: 0 },
     plungerPower: 0,
     plungerHeld: false,
     leftFlipperUp: false,
@@ -51,10 +55,10 @@ export default function PinballContent() {
     rightFlipperAngle: Math.PI - 0.35,
     bumpers: [
       { x: 100, y: 140, r: 18, score: 100, flash: 0 },
-      { x: 170, y: 110, r: 16, score: 150, flash: 0 },
-      { x: 140, y: 190, r: 20, score: 100, flash: 0 },
-      { x: 70, y: 240, r: 14, score: 200, flash: 0 },
-      { x: 190, y: 200, r: 15, score: 150, flash: 0 },
+      { x: 165, y: 110, r: 16, score: 150, flash: 0 },
+      { x: 135, y: 190, r: 20, score: 100, flash: 0 },
+      { x: 65, y: 240, r: 14, score: 200, flash: 0 },
+      { x: 185, y: 210, r: 15, score: 150, flash: 0 },
     ] as Bumper[],
     targets: [
       { x: 40, y: 80, w: 8, h: 28, score: 500, hit: false, label: 'S' },
@@ -65,7 +69,7 @@ export default function PinballContent() {
     ] as Target[],
     score: 0,
     balls: 3,
-    gameState: 'ready' as string,
+    gameState: 'ready' as 'ready' | 'playing' | 'launching' | 'gameover',
     animFrame: 0,
     stars: Array.from({ length: 30 }, () => ({
       x: Math.random() * (TABLE_W - 30),
@@ -77,7 +81,9 @@ export default function PinballContent() {
 
   const resetBall = useCallback(() => {
     const s = state.current;
-    s.ball = { x: TABLE_W - 18, y: TABLE_H - 100, vx: 0, vy: 0 };
+    s.ball = { x: TABLE_W - 18, y: TABLE_H - 90, vx: 0, vy: 0 };
+    s.plungerPower = 0;
+    s.plungerHeld = false;
     s.gameState = 'ready';
     s.targets.forEach(t => { t.hit = false; });
     setGameState('ready');
@@ -90,7 +96,11 @@ export default function PinballContent() {
     if (s.balls <= 0) {
       s.gameState = 'gameover';
       setGameState('gameover');
-      setHighScore(prev => Math.max(prev, s.score));
+      setHighScore(prev => {
+        const next = Math.max(prev, s.score);
+        try { localStorage.setItem('xp_pinball_hi', String(next)); } catch { /* ignore */ }
+        return next;
+      });
     } else {
       resetBall();
     }
@@ -105,37 +115,52 @@ export default function PinballContent() {
     resetBall();
   }, [resetBall]);
 
+  const launchBall = useCallback((powerMultiplier = 1) => {
+    const s = state.current;
+    if (s.gameState === 'ready' || s.gameState === 'launching') {
+      const p = Math.max(30, s.plungerPower > 0 ? s.plungerPower : 70 * powerMultiplier);
+      s.ball.vy = -(p / PLUNGER_MAX) * 14 - 3;
+      s.ball.vx = 0;
+      s.plungerPower = 0;
+      s.plungerHeld = false;
+      s.gameState = 'playing';
+      setGameState('playing');
+      playBeep(880, 0.15, 0.08);
+    }
+  }, []);
+
   // ─── Input ──────────────────────────────────────────────────────────
   useEffect(() => {
     const s = state.current;
 
     const down = (e: KeyboardEvent) => {
-      if (e.key === 'z' || e.key === 'Z' || e.key === 'ArrowLeft') { s.leftFlipperUp = true; }
-      if (e.key === 'm' || e.key === 'M' || e.key === '/' || e.key === 'ArrowRight') { s.rightFlipperUp = true; }
-      if (e.key === ' ' || e.key === 'ArrowDown') {
+      if (e.key === 'z' || e.key === 'Z' || e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        s.leftFlipperUp = true;
+      }
+      if (e.key === 'm' || e.key === 'M' || e.key === '/' || e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        s.rightFlipperUp = true;
+      }
+      if (e.key === ' ' || e.key === 'ArrowDown' || e.key === 'Enter') {
         e.preventDefault();
         if (s.gameState === 'ready') {
           s.plungerHeld = true;
           s.gameState = 'launching';
-        }
-        if (s.gameState === 'gameover') {
+          setGameState('launching');
+        } else if (s.gameState === 'gameover') {
           newGame();
         }
       }
     };
 
     const up = (e: KeyboardEvent) => {
-      if (e.key === 'z' || e.key === 'Z' || e.key === 'ArrowLeft') { s.leftFlipperUp = false; }
-      if (e.key === 'm' || e.key === 'M' || e.key === '/' || e.key === 'ArrowRight') { s.rightFlipperUp = false; }
-      if ((e.key === ' ' || e.key === 'ArrowDown') && s.plungerHeld) {
-        s.plungerHeld = false;
-        // Launch!
-        s.ball.vy = -(s.plungerPower / PLUNGER_MAX) * 14 - 2;
-        s.ball.vx = -0.5;
-        s.plungerPower = 0;
-        s.gameState = 'playing';
-        setGameState('playing');
-        playBeep(880, 0.15, 0.08);
+      if (e.key === 'z' || e.key === 'Z' || e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        s.leftFlipperUp = false;
+      }
+      if (e.key === 'm' || e.key === 'M' || e.key === '/' || e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        s.rightFlipperUp = false;
+      }
+      if ((e.key === ' ' || e.key === 'ArrowDown' || e.key === 'Enter') && s.plungerHeld) {
+        launchBall();
       }
     };
 
@@ -145,7 +170,7 @@ export default function PinballContent() {
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
     };
-  }, [newGame]);
+  }, [newGame, launchBall]);
 
   // ─── Game Loop ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -161,11 +186,11 @@ export default function PinballContent() {
 
       // — Plunger charge —
       if (s.plungerHeld && s.plungerPower < PLUNGER_MAX) {
-        s.plungerPower = Math.min(PLUNGER_MAX, s.plungerPower + 2);
+        s.plungerPower = Math.min(PLUNGER_MAX, s.plungerPower + 2.5);
       }
 
       // — Flipper animation —
-      const flipSpeed = 0.25;
+      const flipSpeed = 0.35;
       const lTarget = s.leftFlipperUp ? -0.55 : 0.35;
       const rTarget = s.rightFlipperUp ? Math.PI + 0.55 : Math.PI - 0.35;
       s.leftFlipperAngle += (lTarget - s.leftFlipperAngle) * flipSpeed;
@@ -179,137 +204,169 @@ export default function PinballContent() {
         s.ball.x += s.ball.vx;
         s.ball.y += s.ball.vy;
 
-        // Walls
-        const leftWall = 8;
-        const rightWall = TABLE_W - 28;
-        const launchLane = TABLE_W - 28;
-        
-        // Top wall
-        if (s.ball.y - BALL_R < 8) {
-          s.ball.y = 8 + BALL_R;
-          s.ball.vy = Math.abs(s.ball.vy) * 0.7;
-          playBeep(600, 0.05, 0.05);
-        }
+        const launchChuteX = TABLE_W - 28;
 
-        // Left wall
-        if (s.ball.x - BALL_R < leftWall) {
-          s.ball.x = leftWall + BALL_R;
-          s.ball.vx = Math.abs(s.ball.vx) * 0.7;
-          playBeep(500, 0.05, 0.05);
-        }
-
-        // Right wall / launch lane divider
-        if (s.ball.y > 60 && s.ball.x + BALL_R > launchLane) {
-          s.ball.x = launchLane - BALL_R;
-          s.ball.vx = -Math.abs(s.ball.vx) * 0.7;
-        }
-        if (s.ball.x + BALL_R > TABLE_W - 8) {
-          s.ball.x = TABLE_W - 8 - BALL_R;
-          s.ball.vx = -Math.abs(s.ball.vx) * 0.7;
-        }
-
-        // Guide rails (slanted walls near top)
-        // Left guide
-        if (s.ball.y < 160 && s.ball.x < 45) {
-          const guideX = 20 + (160 - s.ball.y) * 0.15;
-          if (s.ball.x - BALL_R < guideX) {
-            s.ball.x = guideX + BALL_R;
-            s.ball.vx = Math.abs(s.ball.vx) * 0.5 + 0.5;
-            playBeep(400, 0.04, 0.04);
+        // In Launch Chute Check (x > launchChuteX)
+        if (s.ball.x >= launchChuteX - 2) {
+          // Ball is in or near chute
+          // Right wall of chute
+          if (s.ball.x + BALL_R > TABLE_W - 8) {
+            s.ball.x = TABLE_W - 8 - BALL_R;
+            s.ball.vx = -Math.abs(s.ball.vx) * 0.5;
           }
-        }
-
-        // Bumper collisions
-        for (const b of s.bumpers) {
-          const dx = s.ball.x - b.x;
-          const dy = s.ball.y - b.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < BALL_R + b.r) {
-            const nx = dx / dist;
-            const ny = dy / dist;
-            s.ball.x = b.x + nx * (BALL_R + b.r + 1);
-            s.ball.y = b.y + ny * (BALL_R + b.r + 1);
-            const speed = Math.sqrt(s.ball.vx ** 2 + s.ball.vy ** 2);
-            const bounce = Math.max(speed, 4) * 1.1;
-            s.ball.vx = nx * bounce;
-            s.ball.vy = ny * bounce;
-            b.flash = 8;
-            s.score += b.score;
-            setScore(s.score);
-            playBeep(1200 + Math.random() * 400, 0.1, 0.1);
+          // Left wall of chute (only below the arch opening y > 60)
+          if (s.ball.y > 60 && s.ball.x - BALL_R < launchChuteX) {
+            s.ball.x = launchChuteX + BALL_R;
+            s.ball.vx = Math.abs(s.ball.vx) * 0.5;
           }
-          if (b.flash > 0) b.flash--;
-        }
+          // Top arch exit (y <= 60) -> curve out into main table!
+          if (s.ball.y <= 55) {
+            s.ball.vx = -3.8;
+            s.ball.vy = Math.min(s.ball.vy, -1.0);
+            s.ball.x = launchChuteX - 6;
+            playBeep(750, 0.08, 0.08);
+          }
+        } else {
+          // Ball is in MAIN playfield (x < launchChuteX)
 
-        // Target collisions
-        for (const t of s.targets) {
-          if (t.hit) continue;
-          if (
-            s.ball.x + BALL_R > t.x &&
-            s.ball.x - BALL_R < t.x + t.w &&
-            s.ball.y + BALL_R > t.y &&
-            s.ball.y - BALL_R < t.y + t.h
-          ) {
-            t.hit = true;
-            s.score += t.score;
-            setScore(s.score);
-            s.ball.vy = -s.ball.vy * 0.5;
-            s.ball.vx += (Math.random() - 0.5) * 2;
-            playBeep(2000, 0.08, 0.08);
-            // Bonus for all SPACE targets
-            if (s.targets.every(tt => tt.hit)) {
-              s.score += 5000;
+          // Top wall
+          if (s.ball.y - BALL_R < 8) {
+            s.ball.y = 8 + BALL_R;
+            s.ball.vy = Math.abs(s.ball.vy) * 0.7;
+            playBeep(600, 0.05, 0.05);
+          }
+
+          // Left wall
+          if (s.ball.x - BALL_R < 8) {
+            s.ball.x = 8 + BALL_R;
+            s.ball.vx = Math.abs(s.ball.vx) * 0.7;
+            playBeep(500, 0.05, 0.05);
+          }
+
+          // Right divider (prevent going back into launch lane when y > 60)
+          if (s.ball.y > 60 && s.ball.x + BALL_R > launchChuteX) {
+            s.ball.x = launchChuteX - BALL_R;
+            s.ball.vx = -Math.abs(s.ball.vx) * 0.7;
+            playBeep(450, 0.04, 0.04);
+          }
+
+          // Guide rail (slanted wall near top left)
+          if (s.ball.y < 160 && s.ball.x < 45) {
+            const guideX = 16 + (160 - s.ball.y) * 0.15;
+            if (s.ball.x - BALL_R < guideX) {
+              s.ball.x = guideX + BALL_R;
+              s.ball.vx = Math.abs(s.ball.vx) * 0.6 + 0.8;
+              playBeep(400, 0.04, 0.04);
+            }
+          }
+
+          // Bumpers collisions
+          for (const b of s.bumpers) {
+            const dx = s.ball.x - b.x;
+            const dy = s.ball.y - b.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < BALL_R + b.r) {
+              const nx = dx / (dist || 1);
+              const ny = dy / (dist || 1);
+              s.ball.x = b.x + nx * (BALL_R + b.r + 1);
+              s.ball.y = b.y + ny * (BALL_R + b.r + 1);
+              const speed = Math.sqrt(s.ball.vx ** 2 + s.ball.vy ** 2);
+              const bounce = Math.max(speed, 5) * 1.15;
+              s.ball.vx = nx * bounce;
+              s.ball.vy = ny * bounce;
+              b.flash = 8;
+              s.score += b.score;
               setScore(s.score);
-              playBeep(1500, 0.3, 0.15);
-              setTimeout(() => s.targets.forEach(tt => { tt.hit = false; }), 1500);
+              playBeep(1200 + Math.random() * 400, 0.1, 0.1);
+            }
+            if (b.flash > 0) b.flash--;
+          }
+
+          // Target collisions
+          for (const t of s.targets) {
+            if (t.hit) continue;
+            if (
+              s.ball.x + BALL_R > t.x &&
+              s.ball.x - BALL_R < t.x + t.w &&
+              s.ball.y + BALL_R > t.y &&
+              s.ball.y - BALL_R < t.y + t.h
+            ) {
+              t.hit = true;
+              s.score += t.score;
+              setScore(s.score);
+              s.ball.vy = -s.ball.vy * 0.5;
+              s.ball.vx += (Math.random() - 0.5) * 2;
+              playBeep(2000, 0.08, 0.08);
+              // Bonus for all SPACE targets
+              if (s.targets.every(tt => tt.hit)) {
+                s.score += 5000;
+                setScore(s.score);
+                playBeep(1500, 0.3, 0.15);
+                setTimeout(() => s.targets.forEach(tt => { tt.hit = false; }), 1500);
+              }
             }
           }
-        }
 
-        // Flipper collision (simplified — treat flipper as a line segment)
-        const flipperCheck = (fx: number, fy: number, angle: number, isLeft: boolean) => {
-          const ex = fx + Math.cos(angle) * FLIPPER_LEN;
-          const ey = fy + Math.sin(angle) * FLIPPER_LEN;
-          // Point-to-segment distance
-          const lx = ex - fx, ly = ey - fy;
-          const len2 = lx * lx + ly * ly;
-          let t = ((s.ball.x - fx) * lx + (s.ball.y - fy) * ly) / len2;
-          t = Math.max(0, Math.min(1, t));
-          const cx = fx + t * lx, cy = fy + t * ly;
-          const dx = s.ball.x - cx, dy = s.ball.y - cy;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < BALL_R + FLIPPER_W / 2) {
-            const nx = dx / dist, ny = dy / dist;
-            s.ball.x = cx + nx * (BALL_R + FLIPPER_W / 2 + 1);
-            s.ball.y = cy + ny * (BALL_R + FLIPPER_W / 2 + 1);
-            const isUp = isLeft ? s.leftFlipperUp : s.rightFlipperUp;
-            if (isUp) {
-              s.ball.vy = -Math.abs(s.ball.vy) * 1.5 - 4;
-              s.ball.vx += isLeft ? 2 : -2;
-              playBeep(700, 0.08, 0.08);
-            } else {
-              s.ball.vy = -Math.abs(s.ball.vy) * 0.3;
-              playBeep(300, 0.05, 0.05);
+          // Flipper collision detection
+          const flipperCheck = (fx: number, fy: number, angle: number, isLeft: boolean) => {
+            const ex = fx + Math.cos(angle) * FLIPPER_LEN;
+            const ey = fy + Math.sin(angle) * FLIPPER_LEN;
+            const lx = ex - fx, ly = ey - fy;
+            const len2 = lx * lx + ly * ly;
+            let t = ((s.ball.x - fx) * lx + (s.ball.y - fy) * ly) / len2;
+            t = Math.max(0, Math.min(1, t));
+            const cx = fx + t * lx, cy = fy + t * ly;
+            const dx = s.ball.x - cx, dy = s.ball.y - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < BALL_R + FLIPPER_W / 2) {
+              const nx = dx / (dist || 1), ny = dy / (dist || 1);
+              s.ball.x = cx + nx * (BALL_R + FLIPPER_W / 2 + 1);
+              s.ball.y = cy + ny * (BALL_R + FLIPPER_W / 2 + 1);
+              const isUp = isLeft ? s.leftFlipperUp : s.rightFlipperUp;
+              if (isUp) {
+                s.ball.vy = -Math.abs(s.ball.vy) * 1.4 - 5.5;
+                s.ball.vx += isLeft ? 3.0 : -3.0;
+                playBeep(750, 0.08, 0.1);
+              } else {
+                s.ball.vy = -Math.abs(s.ball.vy) * 0.4 - 1.0;
+                playBeep(320, 0.05, 0.06);
+              }
+            }
+          };
+
+          const lfx = 55, lfy = TABLE_H - 60;
+          const rfx = TABLE_W - 85, rfy = TABLE_H - 60;
+          flipperCheck(lfx, lfy, s.leftFlipperAngle, true);
+          flipperCheck(rfx, rfy, s.rightFlipperAngle, false);
+
+          // Slingshots (triangular side bumpers)
+          if (s.ball.y > TABLE_H - 120 && s.ball.y < TABLE_H - 60) {
+            // Left slingshot
+            if (s.ball.x > 25 && s.ball.x < 55 && s.ball.x - 25 > (TABLE_H - 60 - s.ball.y) * 0.4) {
+              s.ball.vx = Math.abs(s.ball.vx) * 1.2 + 2;
+              s.ball.vy = -Math.abs(s.ball.vy) * 0.8 - 2;
+              playBeep(900, 0.06, 0.08);
+            }
+            // Right slingshot
+            if (s.ball.x > TABLE_W - 85 && s.ball.x < TABLE_W - 55) {
+              s.ball.vx = -Math.abs(s.ball.vx) * 1.2 - 2;
+              s.ball.vy = -Math.abs(s.ball.vy) * 0.8 - 2;
+              playBeep(900, 0.06, 0.08);
             }
           }
-        };
 
-        const lfx = 60, lfy = TABLE_H - 60;
-        const rfx = TABLE_W - 88, rfy = TABLE_H - 60;
-        flipperCheck(lfx, lfy, s.leftFlipperAngle, true);
-        flipperCheck(rfx, rfy, s.rightFlipperAngle, false);
+          // Drain check
+          if (s.ball.y > TABLE_H + 20) {
+            playBeep(200, 0.3, 0.1);
+            loseBall();
+          }
 
-        // Drain
-        if (s.ball.y > TABLE_H + 20) {
-          playBeep(200, 0.3, 0.1);
-          loseBall();
-        }
-
-        // Speed cap
-        const spd = Math.sqrt(s.ball.vx ** 2 + s.ball.vy ** 2);
-        if (spd > 16) {
-          s.ball.vx *= 16 / spd;
-          s.ball.vy *= 16 / spd;
+          // Speed cap
+          const spd = Math.sqrt(s.ball.vx ** 2 + s.ball.vy ** 2);
+          if (spd > 18) {
+            s.ball.vx *= 18 / spd;
+            s.ball.vy *= 18 / spd;
+          }
         }
       }
 
@@ -361,15 +418,15 @@ export default function PinballContent() {
       // Launch lane
       ctx.fillStyle = 'rgba(30, 20, 60, 0.6)';
       ctx.fillRect(TABLE_W - 28, 60, 20, TABLE_H - 60);
-      ctx.strokeStyle = 'rgba(80, 100, 180, 0.3)';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(80, 100, 180, 0.4)';
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(TABLE_W - 28, 60);
       ctx.lineTo(TABLE_W - 28, TABLE_H);
       ctx.stroke();
 
       // Arch at top of launch lane
-      ctx.strokeStyle = 'rgba(80, 140, 255, 0.4)';
+      ctx.strokeStyle = 'rgba(80, 140, 255, 0.6)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(TABLE_W - 18, 60, 10, Math.PI, 0);
@@ -377,7 +434,6 @@ export default function PinballContent() {
 
       // Bumpers
       for (const b of s.bumpers) {
-        // Glow
         if (b.flash > 0) {
           const glow = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * 2);
           glow.addColorStop(0, 'rgba(255, 100, 50, 0.6)');
@@ -397,14 +453,12 @@ export default function PinballContent() {
         ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
         ctx.fill();
 
-        // Ring
         ctx.strokeStyle = b.flash > 0 ? '#ffaa66' : '#6699ff';
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.r + 2, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Score label
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 8px Tahoma, sans-serif';
         ctx.textAlign = 'center';
@@ -430,28 +484,23 @@ export default function PinballContent() {
         ctx.fillText(t.label, t.x + t.w / 2, t.y + t.h / 2);
       }
 
-      // Slingshots (triangular walls near flippers)
+      // Slingshots (triangular side bumpers)
       ctx.strokeStyle = '#4488cc';
       ctx.lineWidth = 3;
       // Left sling
       ctx.beginPath();
       ctx.moveTo(25, TABLE_H - 120);
       ctx.lineTo(25, TABLE_H - 50);
-      ctx.lineTo(60, TABLE_H - 60);
+      ctx.lineTo(55, TABLE_H - 60);
       ctx.closePath();
       ctx.stroke();
       // Right sling
       ctx.beginPath();
       ctx.moveTo(TABLE_W - 53, TABLE_H - 120);
       ctx.lineTo(TABLE_W - 53, TABLE_H - 50);
-      ctx.lineTo(TABLE_W - 88, TABLE_H - 60);
+      ctx.lineTo(TABLE_W - 85, TABLE_H - 60);
       ctx.closePath();
       ctx.stroke();
-
-      // Outlane guides
-      ctx.fillStyle = 'rgba(80, 60, 160, 0.4)';
-      ctx.fillRect(10, TABLE_H - 120, 12, 70);
-      ctx.fillRect(TABLE_W - 50, TABLE_H - 120, 12, 70);
 
       // Flippers
       const drawFlipper = (fx: number, fy: number, angle: number, color: string) => {
@@ -477,21 +526,21 @@ export default function PinballContent() {
         ctx.fill();
         ctx.restore();
       };
-      drawFlipper(60, TABLE_H - 60, s.leftFlipperAngle, '#ddd');
-      drawFlipper(TABLE_W - 88, TABLE_H - 60, s.rightFlipperAngle, '#ddd');
+      drawFlipper(55, TABLE_H - 60, s.leftFlipperAngle, '#eee');
+      drawFlipper(TABLE_W - 85, TABLE_H - 60, s.rightFlipperAngle, '#eee');
 
       // Drain opening
       ctx.fillStyle = '#000';
-      ctx.fillRect(60, TABLE_H - 12, TABLE_W - 148, 12);
+      ctx.fillRect(55, TABLE_H - 12, TABLE_W - 140, 12);
 
       // Plunger
       const plungerX = TABLE_W - 18;
       const plungerY = TABLE_H - 30;
       ctx.fillStyle = '#666';
-      ctx.fillRect(plungerX - PLUNGER_W / 2, plungerY - 50 + s.plungerPower * 0.5, PLUNGER_W, 50);
+      ctx.fillRect(plungerX - 8, plungerY - 50 + s.plungerPower * 0.5, 16, 50);
       // Plunger knob
       const knobGrad = ctx.createRadialGradient(plungerX, plungerY + s.plungerPower * 0.5, 0, plungerX, plungerY + s.plungerPower * 0.5, 10);
-      knobGrad.addColorStop(0, '#ccc');
+      knobGrad.addColorStop(0, '#fff');
       knobGrad.addColorStop(1, '#666');
       ctx.fillStyle = knobGrad;
       ctx.beginPath();
@@ -505,16 +554,14 @@ export default function PinballContent() {
 
       // Ball
       if (s.gameState === 'playing' || s.gameState === 'ready' || s.gameState === 'launching') {
-        // Ball glow
         const ballGlow = ctx.createRadialGradient(s.ball.x, s.ball.y, 0, s.ball.x, s.ball.y, BALL_R * 3);
-        ballGlow.addColorStop(0, 'rgba(200, 200, 255, 0.3)');
+        ballGlow.addColorStop(0, 'rgba(200, 200, 255, 0.4)');
         ballGlow.addColorStop(1, 'rgba(200, 200, 255, 0)');
         ctx.fillStyle = ballGlow;
         ctx.beginPath();
         ctx.arc(s.ball.x, s.ball.y, BALL_R * 3, 0, Math.PI * 2);
         ctx.fill();
 
-        // Ball body
         const ballGrad = ctx.createRadialGradient(s.ball.x - 2, s.ball.y - 2, 0, s.ball.x, s.ball.y, BALL_R);
         ballGrad.addColorStop(0, '#fff');
         ballGrad.addColorStop(0.6, '#c0c0d0');
@@ -527,18 +574,18 @@ export default function PinballContent() {
 
       // Game over overlay
       if (s.gameState === 'gameover') {
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillStyle = 'rgba(0,0,0,0.75)';
         ctx.fillRect(0, 0, TABLE_W, TABLE_H);
         ctx.fillStyle = '#ff4466';
-        ctx.font = 'bold 24px Tahoma, sans-serif';
+        ctx.font = 'bold 22px Tahoma, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('GAME OVER', TABLE_W / 2, TABLE_H / 2 - 30);
-        ctx.fillStyle = '#aaa';
+        ctx.fillText('GAME OVER', TABLE_W / 2, TABLE_H / 2 - 25);
+        ctx.fillStyle = '#fff';
         ctx.font = '12px Tahoma, sans-serif';
         ctx.fillText(`Score: ${s.score}`, TABLE_W / 2, TABLE_H / 2 + 5);
         ctx.fillStyle = '#6699ff';
         ctx.font = '11px Tahoma, sans-serif';
-        ctx.fillText('Press SPACE to play again', TABLE_W / 2, TABLE_H / 2 + 35);
+        ctx.fillText('Click New Game or Space to Play', TABLE_W / 2, TABLE_H / 2 + 30);
       }
 
       s.animFrame = requestAnimationFrame(loop);
@@ -551,8 +598,32 @@ export default function PinballContent() {
     };
   }, [loseBall, newGame]);
 
+  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (state.current.gameState === 'gameover') {
+      newGame();
+      return;
+    }
+
+    if (x > TABLE_W - 35) {
+      // Clicked plunger chute -> launch!
+      launchBall(1);
+    } else if (x < TABLE_W / 2) {
+      // Clicked left side -> pulse left flipper
+      state.current.leftFlipperUp = true;
+      setTimeout(() => { state.current.leftFlipperUp = false; }, 200);
+    } else {
+      // Clicked right side -> pulse right flipper
+      state.current.rightFlipperUp = true;
+      setTimeout(() => { state.current.rightFlipperUp = false; }, 200);
+    }
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#1a1a2e', fontFamily: 'Tahoma, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#1a1a2e', fontFamily: 'Tahoma, sans-serif', userSelect: 'none' }}>
       {/* Top score bar */}
       <div style={{
         display: 'flex',
@@ -577,40 +648,81 @@ export default function PinballContent() {
       </div>
 
       {/* Canvas */}
-      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', padding: '4px' }}>
         <canvas
           ref={canvasRef}
           width={TABLE_W}
           height={TABLE_H}
+          onClick={handleCanvasClick}
           style={{
             border: '1px solid #333',
             borderRadius: '4px',
             boxShadow: '0 0 20px rgba(60, 80, 200, 0.3)',
-            cursor: 'default',
+            cursor: 'pointer',
           }}
         />
       </div>
 
-      {/* Controls bar */}
+      {/* Interactive Controls bar with clickable buttons */}
       <div style={{
-        padding: '5px 10px',
+        padding: '6px 10px',
         background: 'linear-gradient(180deg, #2a2a4e 0%, #1a1a30 100%)',
         borderTop: '1px solid #333',
         display: 'flex',
-        justifyContent: 'center',
-        gap: '12px',
-        fontSize: '9px',
-        color: '#888',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '6px',
       }}>
-        <span>← / Z : Left Flipper</span>
-        <span>→ / M : Right Flipper</span>
-        <span>SPACE : Plunger</span>
+        <button
+          className="xp-button"
+          onMouseDown={() => { state.current.leftFlipperUp = true; }}
+          onMouseUp={() => { state.current.leftFlipperUp = false; }}
+          onTouchStart={() => { state.current.leftFlipperUp = true; }}
+          onTouchEnd={() => { state.current.leftFlipperUp = false; }}
+          style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 'bold' }}
+        >
+          ◀ Left (Z)
+        </button>
+
+        <button
+          className="xp-button"
+          onClick={() => launchBall(1)}
+          onMouseDown={() => {
+            if (state.current.gameState === 'ready') {
+              state.current.plungerHeld = true;
+              state.current.gameState = 'launching';
+              setGameState('launching');
+            }
+          }}
+          onMouseUp={() => launchBall()}
+          style={{
+            fontSize: '10px',
+            padding: '3px 12px',
+            fontWeight: 'bold',
+            background: gameState === 'ready' ? 'linear-gradient(180deg, #5cb85c 0%, #449d44 100%)' : undefined,
+            color: gameState === 'ready' ? '#fff' : undefined,
+          }}
+        >
+          🚀 Launch (Space)
+        </button>
+
+        <button
+          className="xp-button"
+          onMouseDown={() => { state.current.rightFlipperUp = true; }}
+          onMouseUp={() => { state.current.rightFlipperUp = false; }}
+          onTouchStart={() => { state.current.rightFlipperUp = true; }}
+          onTouchEnd={() => { state.current.rightFlipperUp = false; }}
+          style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 'bold' }}
+        >
+          Right (M) ▶
+        </button>
+
         <button
           className="xp-button"
           onClick={newGame}
-          style={{ fontSize: '9px', padding: '1px 8px' }}
+          style={{ fontSize: '9px', padding: '3px 6px' }}
         >
-          New Game
+          Reset
         </button>
       </div>
     </div>

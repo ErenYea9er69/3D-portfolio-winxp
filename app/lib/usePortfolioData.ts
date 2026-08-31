@@ -303,6 +303,24 @@ export function usePortfolioData() {
     return res.json();
   };
 
+  // Update Profile in Neon DB
+  const updateProfile = async (data: Partial<PortfolioProfile>) => {
+    const payload = { ...profile, ...data };
+    const res = await fetch('/api/portfolio/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    if (json.success && json.data) {
+      setProfile(json.data);
+      if (cachedBootstrap) {
+        cachedBootstrap.profile = json.data;
+      }
+    }
+    return json;
+  };
+
   return {
     profile,
     projects,
@@ -313,6 +331,7 @@ export function usePortfolioData() {
     isLoading,
     isDbConnected,
     refetch: fetchBootstrapData,
+    updateProfile,
     submitContactMessage,
     saveDocument,
     loadDocument,
