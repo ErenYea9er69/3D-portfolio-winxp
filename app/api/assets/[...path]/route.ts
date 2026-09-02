@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/app/lib/db';
+import { sql, isDatabaseConfigured } from '@/app/lib/db';
 
 // High-speed in-memory server cache for database assets
 interface CachedAsset {
@@ -47,6 +47,10 @@ export async function GET(
     }
 
     // 2. Query Neon PostgreSQL database
+    if (!isDatabaseConfigured) {
+      return new NextResponse(`Asset not found: ${decodedPath}`, { status: 404 });
+    }
+
     const rows = await sql`
       SELECT id, mime_type, data, size_bytes
       FROM system_assets

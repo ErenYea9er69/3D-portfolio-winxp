@@ -70,75 +70,18 @@ const EMOTICONS = [
   { code: '(coffee)', emoji: '☕', label: 'Coffee' },
 ];
 
+import soundEngine from '@/app/lib/sound';
+
 function playMsnAudio(type: 'send' | 'receive' | 'nudge') {
-  try {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
-    const now = ctx.currentTime;
-
-    if (type === 'receive') {
-      // Classic MSN 2-tone alert chime (F5 -> A5)
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.frequency.setValueAtTime(698.46, now);
-      gain1.gain.setValueAtTime(0.12, now);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.16);
-
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.frequency.setValueAtTime(880.00, now + 0.08);
-      gain2.gain.setValueAtTime(0.14, now + 0.08);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
-      osc2.start(now + 0.08);
-      osc2.stop(now + 0.32);
-    } else if (type === 'send') {
-      // Gentle outgoing click/pop
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.frequency.setValueAtTime(520, now);
-      osc.frequency.exponentialRampToValueAtTime(260, now + 0.06);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.07);
-    } else if (type === 'nudge') {
-      // Low vibration rumble + 2 high screech tones (MSN Nudge buzzer)
-      const oscLow = ctx.createOscillator();
-      const gainLow = ctx.createGain();
-      oscLow.type = 'sawtooth';
-      oscLow.frequency.setValueAtTime(140, now);
-      gainLow.gain.setValueAtTime(0.2, now);
-      gainLow.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-      oscLow.connect(gainLow);
-      gainLow.connect(ctx.destination);
-      oscLow.start(now);
-      oscLow.stop(now + 0.5);
-
-      const oscHigh = ctx.createOscillator();
-      const gainHigh = ctx.createGain();
-      oscHigh.type = 'triangle';
-      oscHigh.frequency.setValueAtTime(880, now);
-      oscHigh.frequency.setValueAtTime(1174.66, now + 0.12);
-      gainHigh.gain.setValueAtTime(0.18, now);
-      gainHigh.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-      oscHigh.connect(gainHigh);
-      gainHigh.connect(ctx.destination);
-      oscHigh.start(now);
-      oscHigh.stop(now + 0.5);
-    }
-  } catch {
-    // Audio Context not allowed or muted
+  if (type === 'receive') {
+    soundEngine.play('msn_receive');
+  } else if (type === 'send') {
+    soundEngine.play('msn_send');
+  } else if (type === 'nudge') {
+    soundEngine.play('msn_nudge');
   }
 }
+
 
 function getBotReply(msg: string, buddyId: string): string {
   const lower = msg.toLowerCase();
@@ -232,7 +175,7 @@ export default function MsnMessengerContent() {
   // Scroll to bottom on new message
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeMessages, isTyping]);
+  }, [activeMessages.length, isTyping]);
 
   const handleSendMessage = () => {
     if (!inputText.trim()) return;

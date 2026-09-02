@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://rayen-xp-portfolio.vercel.app'),
   title: "Rayen Ben Aissa - Portfolio XP",
   description: "Rayen Ben Aissa's Windows XP-themed portfolio - Full Stack Developer from Tunisia",
   keywords: ["portfolio", "windows xp", "developer", "full stack", "react", "nextjs", "rayen ben aissa"],

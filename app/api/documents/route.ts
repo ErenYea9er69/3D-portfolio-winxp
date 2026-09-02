@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/app/lib/db';
+import { sql, isDatabaseConfigured } from '@/app/lib/db';
+import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
+
+// In-memory fallback cache when running offline / without Neon DB
+const fallbackDocs = new Map<string, { id: string; title: string; content: string; doc_type: string; created_at: string; updated_at: string }>();
 
 // GET /api/documents or /api/documents?id=xxx&type=notepad
 export async function GET(request: NextRequest) {
@@ -9,6 +13,16 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     const docType = searchParams.get('type');
+
+    if (!isDatabaseConfigured) {
+      if (id) {
+        const doc = fallbackDocs.get(id);
+        if (!doc) return NextResponse.json({ success: false, error: 'Document not found' }, { status: 404 });
+        return NextResponse.json({ success: true, data: doc });
+      }
+      const list = Array.from(fallbackDocs.values()).filter(d => !docType || d.doc_type === docType);
+      return NextResponse.json({ success: true, count: list.length, data: list });
+    }
 
     if (id) {
       const rows = await sql`
@@ -54,10 +68,26 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { id, title, content, doc_type } = body;
 
-    const docId = id || `doc-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-    const docTitle = title || (doc_type === 'wordpad' ? 'Document.rtf' : 'Untitled.txt');
-    const docContent = content || '';
+    const docId = (typeof id === 'string' && id.trim()) ? id.trim() : `doc-${crypto.randomUUID()}`;
+    const rawTitle = typeof title === 'string' ? title.trim() : '';
     const type = doc_type === 'wordpad' ? 'wordpad' : 'notepad';
+    const docTitle = rawTitle.slice(0, 150) || (type === 'wordpad' ? 'Document.rtf' : 'Untitled.txt');
+    const docContent = typeof content === 'string' ? content.slice(0, 500000) : '';
+
+    if (!isDatabaseConfigured) {
+      const existing = fallbackDocs.get(docId);
+      const now = new Date().toISOString();
+      const savedDoc = {
+        id: docId,
+        title: docTitle,
+        content: docContent,
+        doc_type: type,
+        created_at: existing?.created_at || now,
+        updated_at: now,
+      };
+      fallbackDocs.set(docId, savedDoc);
+      return NextResponse.json({ success: true, data: savedDoc });
+    }
 
     const [saved] = await sql`
       INSERT INTO user_documents (id, title, content, doc_type, created_at, updated_at)
@@ -86,6 +116,11 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Document ID required' }, { status: 400 });
     }
 
+    if (!isDatabaseConfigured) {
+      fallbackDocs.delete(id);
+      return NextResponse.json({ success: true, message: 'Document deleted successfully' });
+    }
+
     await sql`DELETE FROM user_documents WHERE id = ${id};`;
     return NextResponse.json({ success: true, message: 'Document deleted successfully' });
   } catch (error: unknown) {
@@ -94,3 +129,4 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
+

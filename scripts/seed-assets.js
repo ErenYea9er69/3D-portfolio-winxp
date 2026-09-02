@@ -4,7 +4,11 @@ const { neon } = require('@neondatabase/serverless');
 require('dotenv').config({ path: '.env.local' });
 require('dotenv').config({ path: '.env' });
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_9TrcwQqMo4eU@ep-shiny-river-aemn37x4-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  console.error('❌ DATABASE_URL is not defined in .env or .env.local');
+  process.exit(1);
+}
 
 const MIME_MAP = {
   '.png': 'image/png',

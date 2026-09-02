@@ -284,7 +284,6 @@ export default function CommandPromptContent({ onOpenApp }: CommandPromptContent
           try {
             // Safely evaluate math expression with arithmetic operators only
             if (/^[0-9+\-*/().\s]+$/.test(expr)) {
-              // eslint-disable-next-line no-eval
               const result = Function(`'use strict'; return (${expr})`)();
               outputLines.push(`Result: ${result}`);
             } else {

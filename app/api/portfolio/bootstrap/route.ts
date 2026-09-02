@@ -1,10 +1,21 @@
 import { NextResponse } from 'next/server';
-import { sql } from '@/app/lib/db';
+import { sql, isDatabaseConfigured } from '@/app/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    if (!isDatabaseConfigured) {
+      return NextResponse.json(
+        {
+          success: true,
+          data: null,
+          source: 'local_defaults',
+        },
+        { status: 200 }
+      );
+    }
+
     const [
       profiles,
       projects,
@@ -43,6 +54,7 @@ export async function GET() {
           buddies,
           documents,
         },
+        source: 'database',
       },
       {
         status: 200,
@@ -52,11 +64,12 @@ export async function GET() {
       }
     );
   } catch (error: unknown) {
-    console.error('Portfolio bootstrap fetch error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to load portfolio data';
+    console.error('Portfolio bootstrap fetch warning:', error);
+    // Graceful fallback response
     return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
+      { success: true, data: null, source: 'local_defaults_fallback' },
+      { status: 200 }
     );
   }
 }
+

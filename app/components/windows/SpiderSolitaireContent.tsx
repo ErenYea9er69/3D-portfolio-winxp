@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import XPIcon from '../XPIcon';
+
 
 // ─── Card Data ──────────────────────────────────────────────────────
 const SUITS = ['♠'] as const; // 1-suit mode for playability
@@ -150,30 +150,6 @@ export default function SpiderSolitaireContent() {
     return found ? checkCompleteSequence(newCols) : newCols;
   }, []);
 
-  const handleCardClick = useCallback((colIdx: number, cardIdx: number) => {
-    const col = columns[colIdx];
-    const card = col[cardIdx];
-    if (!card.faceUp) return;
-
-    // Check if it's a valid sequence from cardIdx to end
-    const seq = col.slice(cardIdx);
-    if (!isSequenceDescending(seq)) return;
-
-    if (dragState === null) {
-      // Pick up
-      setDragState({ colIdx, cardIdx, cards: seq });
-      setHintCol(null);
-    } else {
-      // Try to drop
-      if (dragState.colIdx === colIdx) {
-        // Cancel
-        setDragState(null);
-        return;
-      }
-      tryDrop(colIdx);
-    }
-  }, [columns, dragState]);
-
   const tryDrop = useCallback((targetCol: number) => {
     if (!dragState) return;
     const targetColumn = columns[targetCol];
@@ -201,11 +177,36 @@ export default function SpiderSolitaireContent() {
     setDragState(null);
   }, [dragState, columns, checkCompleteSequence]);
 
+  const handleCardClick = useCallback((colIdx: number, cardIdx: number) => {
+    const col = columns[colIdx];
+    const card = col[cardIdx];
+    if (!card.faceUp) return;
+
+    // Check if it's a valid sequence from cardIdx to end
+    const seq = col.slice(cardIdx);
+    if (!isSequenceDescending(seq)) return;
+
+    if (dragState === null) {
+      // Pick up
+      setDragState({ colIdx, cardIdx, cards: seq });
+      setHintCol(null);
+    } else {
+      // Try to drop
+      if (dragState.colIdx === colIdx) {
+        // Cancel
+        setDragState(null);
+        return;
+      }
+      tryDrop(colIdx);
+    }
+  }, [columns, dragState, tryDrop]);
+
   const handleColumnClick = useCallback((colIdx: number) => {
     if (dragState && columns[colIdx].length === 0) {
       tryDrop(colIdx);
     }
   }, [dragState, columns, tryDrop]);
+
 
   const CARD_W = 50;
   const CARD_H = 70;

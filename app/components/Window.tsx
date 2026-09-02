@@ -268,6 +268,7 @@ export default function Window({
   return (
     <div
       ref={windowRef}
+      data-window-id={id}
       className={`xp-window ${isOpening ? 'window-opening' : ''} ${isClosing ? 'window-closing' : ''}`}
       style={{
         position: 'absolute',

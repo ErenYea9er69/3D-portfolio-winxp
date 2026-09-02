@@ -1,8 +1,14 @@
-import { neon } from '@neondatabase/serverless';
+import { neon, NeonQueryFunction } from '@neondatabase/serverless';
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_9TrcwQqMo4eU@ep-shiny-river-aemn37x4-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require';
+// Load connection strictly from environment variable to prevent secret leakage
+const DATABASE_URL = process.env.DATABASE_URL;
 
-export const sql = neon(DATABASE_URL);
+// Safely provide the SQL client or a dummy client that throws descriptive error if unconfigured
+export const sql = (DATABASE_URL ? neon(DATABASE_URL) : (() => {
+  throw new Error('DATABASE_URL is not configured in environment variables.');
+})) as unknown as NeonQueryFunction<false, false>;
+
+export const isDatabaseConfigured = Boolean(DATABASE_URL);
 
 
 export interface PortfolioProfile {

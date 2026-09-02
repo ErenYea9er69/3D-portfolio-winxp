@@ -12,25 +12,13 @@ const FLIPPER_LEN = 46;
 const FLIPPER_W = 8;
 const PLUNGER_MAX = 80;
 
+import soundEngine from '@/app/lib/sound';
+
 interface Bumper { x: number; y: number; r: number; score: number; flash: number }
 interface Target { x: number; y: number; w: number; h: number; score: number; hit: boolean; label: string }
 
 function playBeep(freq: number, dur: number, vol = 0.12) {
-  try {
-    const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AC) return;
-    const ctx = new AC();
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.value = freq;
-    g.gain.setValueAtTime(vol, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-    osc.connect(g);
-    g.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + dur);
-  } catch { /* silent */ }
+  soundEngine.playPinballBeep(freq, dur, vol);
 }
 
 export default function PinballContent() {
@@ -588,20 +576,19 @@ export default function PinballContent() {
         ctx.fillText('Click New Game or Space to Play', TABLE_W / 2, TABLE_H / 2 + 30);
       }
 
-      s.animFrame = requestAnimationFrame(loop);
+      animId = requestAnimationFrame(loop);
     };
 
-    state.current.animFrame = requestAnimationFrame(loop);
+    let animId = requestAnimationFrame(loop);
     return () => {
       running = false;
-      cancelAnimationFrame(state.current.animFrame);
+      cancelAnimationFrame(animId);
     };
   }, [loseBall, newGame]);
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
 
     if (state.current.gameState === 'gameover') {
       newGame();

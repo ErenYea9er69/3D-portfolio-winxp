@@ -1,136 +1,25 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import XPIcon from '../XPIcon';
 
 interface ControlPanelContentProps {
   onOpenApp?: (appId: string) => void;
 }
 
-// Synthesize authentic Windows XP sound effects using Web Audio API
+import soundEngine from '@/app/lib/sound';
+
+// Synthesize authentic Windows XP sound effects using soundEngine
 function playSynthesizedXPSound(type: string) {
-  try {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
-
-    const now = ctx.currentTime;
-
-    if (type === 'startup') {
-      // Classic uplifting 5-chord XP chime progression (Eb - Bb - G - Bb - C)
-      const notes = [
-        { f: 311.13, t: 0.0, d: 1.2 }, // Eb4
-        { f: 466.16, t: 0.15, d: 1.1 }, // Bb4
-        { f: 392.00, t: 0.35, d: 1.3 }, // G4
-        { f: 466.16, t: 0.55, d: 1.2 }, // Bb4
-        { f: 523.25, t: 0.8, d: 1.8 }, // C5
-        { f: 622.25, t: 0.8, d: 2.0 }, // Eb5
-      ];
-      notes.forEach(({ f, t, d }) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(f, now + t);
-        gain.gain.setValueAtTime(0.001, now + t);
-        gain.gain.exponentialRampToValueAtTime(0.18, now + t + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + t + d);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + t);
-        osc.stop(now + t + d + 0.1);
-      });
-    } else if (type === 'shutdown') {
-      // Classic downward 4-chord progression
-      const notes = [
-        { f: 523.25, t: 0.0, d: 0.7 }, // C5
-        { f: 466.16, t: 0.2, d: 0.7 }, // Bb4
-        { f: 392.00, t: 0.45, d: 0.8 }, // G4
-        { f: 311.13, t: 0.7, d: 1.5 }, // Eb4
-      ];
-      notes.forEach(({ f, t, d }) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(f, now + t);
-        gain.gain.setValueAtTime(0.001, now + t);
-        gain.gain.exponentialRampToValueAtTime(0.15, now + t + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + t + d);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + t);
-        osc.stop(now + t + d + 0.1);
-      });
-    } else if (type === 'ding') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1046.5, now); // C6
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.8);
-    } else if (type === 'error') {
-      // Classic heavy chord / low thump
-      [130.81, 196.00].forEach((f) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(f, now);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.5);
-      });
-    } else if (type === 'tada') {
-      // Victory fanfare (G4 -> C5 -> E5 -> G5)
-      const notes = [
-        { f: 392.00, t: 0.0, d: 0.2 },
-        { f: 523.25, t: 0.12, d: 0.2 },
-        { f: 659.25, t: 0.24, d: 0.2 },
-        { f: 783.99, t: 0.36, d: 1.0 },
-      ];
-      notes.forEach(({ f, t, d }) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(f, now + t);
-        gain.gain.setValueAtTime(0.15, now + t);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + t + d);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + t);
-        osc.stop(now + t + d + 0.05);
-      });
-    } else if (type === 'recycle') {
-      // Crumple / whoosh noise
-      const bufferSize = ctx.sampleRate * 0.3;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const output = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
-      }
-      const whiteNoise = ctx.createBufferSource();
-      whiteNoise.buffer = buffer;
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(1200, now);
-      filter.frequency.exponentialRampToValueAtTime(200, now + 0.3);
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-      whiteNoise.connect(filter);
-      filter.connect(gain);
-      gain.connect(ctx.destination);
-      whiteNoise.start(now);
-    }
-  } catch (err) {
-    console.error('Audio playback error', err);
-  }
+  if (type === 'startup') soundEngine.play('startup');
+  else if (type === 'shutdown') soundEngine.play('shutdown');
+  else if (type === 'ding') soundEngine.play('ding');
+  else if (type === 'error') soundEngine.play('error');
+  else if (type === 'tada') soundEngine.play('exclamation');
+  else if (type === 'recycle') soundEngine.play('recycle_empty');
+  else soundEngine.play('asterisk');
 }
+
 
 export default function ControlPanelContent({ onOpenApp }: ControlPanelContentProps) {
   const [viewMode, setViewMode] = useState<'category' | 'classic'>('category');

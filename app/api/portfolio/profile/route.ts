@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/app/lib/db';
+import { sql, isDatabaseConfigured } from '@/app/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,18 +8,45 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, title, location, bio, status, education, experience, achievements, social_links } = body;
 
+    const cleanName = typeof name === 'string' ? name.trim().slice(0, 100) : 'Rayen Ben Aissa';
+    const cleanTitle = typeof title === 'string' ? title.trim().slice(0, 100) : 'Full Stack Developer';
+    const cleanLocation = typeof location === 'string' ? location.trim().slice(0, 100) : 'Tunisia';
+    const cleanBio = typeof bio === 'string' ? bio.trim().slice(0, 2000) : '';
+    const cleanStatus = typeof status === 'string' ? status.trim().slice(0, 100) : 'Available for work';
+
+    if (!isDatabaseConfigured) {
+      return NextResponse.json({
+        success: true,
+        message: 'Profile updated locally (demo mode).',
+        data: {
+          id: 'main',
+          name: cleanName,
+          title: cleanTitle,
+          location: cleanLocation,
+          bio: cleanBio,
+          avatar_url: '/icons xp/Windows XP Icons/User Accounts.png',
+          status: cleanStatus,
+          education: education || [{ title: 'B.Tech in CS & IT', subtitle: 'Trident Academy of Technology' }],
+          experience: experience || [{ title: 'Freelance Developer', subtitle: 'v0 Ambassador by Vercel' }],
+          achievements: achievements || ['v0 Ambassador by Vercel'],
+          social_links: social_links || [],
+          updated_at: new Date().toISOString(),
+        },
+      });
+    }
+
     const [updated] = await sql`
       INSERT INTO portfolio_profile (
         id, name, title, location, bio, avatar_url, status,
         education, experience, achievements, social_links, updated_at
       ) VALUES (
         'main',
-        ${name || 'Rayen Ben Aissa'},
-        ${title || 'Full Stack Developer'},
-        ${location || 'Tunisia'},
-        ${bio || ''},
+        ${cleanName},
+        ${cleanTitle},
+        ${cleanLocation},
+        ${cleanBio},
         '/icons xp/Windows XP Icons/User Accounts.png',
-        ${status || 'Available for work'},
+        ${cleanStatus},
         ${JSON.stringify(education || [{ title: 'B.Tech in CS & IT', subtitle: 'Trident Academy of Technology' }])}::jsonb,
         ${JSON.stringify(experience || [{ title: 'Freelance Developer', subtitle: 'v0 Ambassador by Vercel' }])}::jsonb,
         ${JSON.stringify(achievements || ['v0 Ambassador by Vercel'])}::jsonb,
@@ -51,3 +78,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
+

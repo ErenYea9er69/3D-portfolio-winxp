@@ -34,6 +34,7 @@ import PictureViewerContent from './windows/PictureViewerContent';
 import DisplayPropertiesContent, { WallpaperOption } from './windows/DisplayPropertiesContent';
 import FolderContent from './windows/FolderContent';
 import ContextMenu, { MenuItem } from './ContextMenu';
+import soundEngine from '@/app/lib/sound';
 
 const WALLPAPERS: WallpaperOption[] = [
   {
@@ -610,6 +611,7 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
   const handleShutdown = useCallback(() => {
     setShowShutdownDialog(false);
     setShutdownState('shuttingdown');
+    soundEngine.play('shutdown');
     setTimeout(() => {
       onShutdown();
     }, 2000);
@@ -618,6 +620,7 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
   const handleRestart = useCallback(() => {
     setShowShutdownDialog(false);
     setShutdownState('restarting');
+    soundEngine.play('shutdown');
     setTimeout(() => {
       sessionStorage.removeItem('xp-booted');
       window.location.reload();
@@ -626,6 +629,7 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
 
   const handleLogOffAction = useCallback(() => {
     setShowShutdownDialog(false);
+    soundEngine.play('shutdown');
     onLogOff();
   }, [onLogOff]);
 
