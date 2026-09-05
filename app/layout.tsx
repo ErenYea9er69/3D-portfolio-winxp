@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Rayen Ben Aissa - Portfolio XP",
     description: "Windows XP style portfolio - Full Stack Developer from Tunisia",
-    url: "https://github.com/StarKnightt/windows-xp-portfolio",
+    url: "https://github.com/ErenYea9er69/3D-portfolio-winxp",
     siteName: "Rayen Ben Aissa Portfolio",
     images: [
       {
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     title: "Rayen Ben Aissa - Portfolio XP",
     description: "Windows XP style portfolio - Full Stack Developer from Tunisia",
     images: ["/og.png"],
-    creator: "@Star_Knight12",
+    creator: "@ErenYea9er",
   },
 };
 

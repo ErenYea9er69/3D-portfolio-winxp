@@ -175,9 +175,8 @@ export default function CommandPromptContent({ onOpenApp }: CommandPromptContent
         outputLines.push(
           'Contact Channels:',
           '• Email:    prasen.nayak@hotmail.com',
-          '• GitHub:   https://github.com/StarKnightt',
-          '• LinkedIn: https://linkedin.com/in/prasenjitnayak',
-          '• Twitter:  https://x.com/Star_Knight12'
+          '• GitHub:   https://github.com/ErenYea9er69',
+          '• Twitter:  https://x.com/ErenYea9er'
         );
         break;
 

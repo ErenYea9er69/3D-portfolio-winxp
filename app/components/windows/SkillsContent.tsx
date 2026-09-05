@@ -153,71 +153,7 @@ export default function SkillsContent() {
         ))}
       </div>
 
-      {/* YouTube Section */}
-      <div style={{
-        background: 'linear-gradient(135deg, #ff0000 0%, #cc0000 100%)',
-        borderRadius: '6px',
-        padding: '12px',
-        color: 'white',
-      }}>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '8px',
-          marginBottom: '10px'
-        }}>
-          <span style={{ fontSize: '18px' }}>📺</span>
-          <span style={{ fontWeight: 'bold', fontSize: '12px' }}>YouTube Content</span>
-        </div>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {videos.map((video, i) => (
-            <a 
-              key={i}
-              href={video.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '6px 8px',
-                background: 'rgba(255,255,255,0.1)',
-                borderRadius: '4px',
-                color: 'white',
-                textDecoration: 'none',
-                fontSize: '10px',
-                transition: 'background 0.2s',
-              }}
-              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-              onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-            >
-              <span>▶</span>
-              <span>{video.title}</span>
-            </a>
-          ))}
-        </div>
-        
-        <a 
-          href="https://youtube.com/@Star_Knight12" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          style={{
-            display: 'block',
-            textAlign: 'center',
-            marginTop: '10px',
-            padding: '6px',
-            background: 'white',
-            color: '#cc0000',
-            borderRadius: '4px',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            textDecoration: 'none',
-          }}
-        >
-          Subscribe to Channel
-        </a>
-      </div>
+
     </div>
   );
 }

@@ -189,20 +189,16 @@ async function init() {
       'Rayen Ben Aissa',
       'Full Stack Developer',
       'Tunisia',
-      'I have learned most of my lessons the hard way. Currently freelancing and collaborating with new people on exciting projects. I love playing video games, sharing thoughts on tech, and touch typing in my free time.',
+      '',
       '/icons xp/Windows XP Icons/User Accounts.png',
       'Available for work',
-      '[{"title": "B.Tech in CS & IT", "subtitle": "Trident Academy of Technology"}]'::jsonb,
-      '[{"title": "Freelance Developer", "subtitle": "v0 Ambassador by Vercel"}]'::jsonb,
-      '["Smart India Hackathon 2022 - EducationX", "Smart India Hackathon 2023 - NexusLink", "v0 Ambassador by Vercel"]'::jsonb,
+      '[{"title": "B.Tech in CS & IT", "subtitle": ""}]'::jsonb,
+      '[{"title": "Freelance Developer", "subtitle": ""}]'::jsonb,
+      '[]'::jsonb,
       '[
-        {"name": "GitHub", "icon": "💻", "url": "https://github.com/StarKnightt"},
-        {"name": "Portfolio Source", "icon": "⭐", "url": "https://github.com/StarKnightt/windows-xp-portfolio"},
-        {"name": "LinkedIn", "icon": "💼", "url": "https://www.linkedin.com/in/prasenjitnayak/"},
-        {"name": "X (Twitter)", "icon": "🐦", "url": "https://x.com/Star_Knight12"},
-        {"name": "YouTube", "icon": "📺", "url": "https://youtube.com/@Star_Knight12"},
-        {"name": "CodePen", "icon": "🎨", "url": "https://codepen.io/StarKnightt"},
-        {"name": "Buy Me a Coffee", "icon": "☕", "url": "https://buymeacoffee.com/prasen"}
+        {"name": "GitHub", "icon": "💻", "url": "https://github.com/ErenYea9er69"},
+        {"name": "Portfolio Source", "icon": "⭐", "url": "https://github.com/ErenYea9er69/3D-portfolio-winxp"},
+        {"name": "X (Twitter)", "icon": "🐦", "url": "https://x.com/ErenYea9er"}
       ]'::jsonb,
       'https://github.com/StarKnightt'
     ) ON CONFLICT (id) DO UPDATE SET
@@ -356,12 +352,7 @@ async function init() {
   console.log('✔ Seeded skills and tech stack');
 
   // Seed YouTube Videos
-  const videosData = [
-    { title: 'Track Your Coding time for free', url: 'https://youtu.be/tBatfQjWxCg', sort_order: 1 },
-    { title: 'Fix multi-cursor in VS Code', url: 'https://youtu.be/E9h7M6ZK_tA', sort_order: 2 },
-    { title: 'GitHub Copilot is now free!', url: 'https://www.youtube.com/watch?v=uIJOUe8T3_I', sort_order: 3 },
-    { title: 'How to run DeepSeek R1 locally', url: 'https://youtu.be/BgB2pW6QgVg', sort_order: 4 },
-  ];
+  const videosData = [];
 
   await sql`DELETE FROM youtube_videos;`;
   for (const v of videosData) {
