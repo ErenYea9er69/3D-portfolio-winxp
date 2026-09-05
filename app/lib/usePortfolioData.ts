@@ -19,7 +19,7 @@ const DEFAULT_PROFILE: PortfolioProfile = {
   name: 'Rayen Ben Aissa',
   title: 'Full Stack Developer',
   location: 'Tunisia',
-  bio: "I've learned most of my lessons the hard way. Currently freelancing and collaborating with new people on exciting projects. I love playing video games, sharing thoughts on tech, and touch typing in my free time.",
+  bio: "",
   avatar_url: '/icons xp/Windows XP Icons/User Accounts.png',
   status: 'Available for work',
   education: [{ title: 'B.Tech in CS & IT', subtitle: '' }],
@@ -129,12 +129,7 @@ const DEFAULT_SKILLS: SkillCategory[] = [
   },
 ];
 
-const DEFAULT_VIDEOS: YoutubeVideo[] = [
-  { id: 1, title: 'Track Your Coding time for free', url: 'https://youtu.be/tBatfQjWxCg', sort_order: 1 },
-  { id: 2, title: 'Fix multi-cursor in VS Code', url: 'https://youtu.be/E9h7M6ZK_tA', sort_order: 2 },
-  { id: 3, title: 'GitHub Copilot is now free!', url: 'https://www.youtube.com/watch?v=uIJOUe8T3_I', sort_order: 3 },
-  { id: 4, title: 'How to run DeepSeek R1 locally', url: 'https://youtu.be/BgB2pW6QgVg', sort_order: 4 },
-];
+const DEFAULT_VIDEOS: YoutubeVideo[] = [];
 
 const DEFAULT_PICTURES: PictureItem[] = [
   {
