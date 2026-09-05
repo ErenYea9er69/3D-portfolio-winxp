@@ -30,6 +30,7 @@ import WordpadContent from './windows/WordpadContent';
 import TaskManagerContent from './windows/TaskManagerContent';
 import MsnMessengerContent from './windows/MsnMessengerContent';
 import PictureViewerContent from './windows/PictureViewerContent';
+import GTAViceCityContent from './windows/GTAViceCityContent';
 
 import DisplayPropertiesContent, { WallpaperOption } from './windows/DisplayPropertiesContent';
 import FolderContent from './windows/FolderContent';
@@ -449,6 +450,16 @@ const initialWindows: WindowState[] = [
     position: { x: 140, y: 50 },
     size: { width: 620, height: 490 },
   },
+  {
+    id: 'gtavc',
+    title: 'GTA Vice City',
+    icon: '/icons xp/Windows XP Icons/Game Controller.png',
+    isOpen: false,
+    isMinimized: false,
+    zIndex: 1,
+    position: { x: 160, y: 40 },
+    size: { width: 800, height: 600 },
+  },
 ];
 
 const desktopIcons = [
@@ -475,6 +486,7 @@ const desktopIcons = [
   { id: 'taskmgr', icon: '/icons xp/Windows XP Icons/Task Manager.png', label: 'Task Manager' },
   { id: 'help', icon: '/icons xp/Windows XP Icons/Help and Support.png', label: 'Help' },
   { id: 'recycle', icon: '/icons xp/Windows XP Icons/Recycle Bin (empty).png', label: 'Recycle Bin' },
+  { id: 'gtavc', icon: '/icons xp/Windows XP Icons/Game Controller.png', label: 'GTA Vice City' },
 ];
 
 const menuItems = [
@@ -495,6 +507,7 @@ const menuItems = [
   { id: 'calculator', title: 'Calculator', icon: '/icons xp/Windows XP Icons/Calculator.png' },
   { id: 'minesweeper', title: 'Minesweeper', icon: '/icons xp/Windows XP Icons/Minesweeper.png' },
   { id: 'pinball', title: '3D Pinball', icon: '/icons xp/Windows XP Icons/Pinball.png' },
+  { id: 'gtavc', title: 'GTA Vice City', icon: '/icons xp/Windows XP Icons/Game Controller.png' },
   { id: 'spidersolitaire', title: 'Spider Solitaire', icon: '/icons xp/Windows XP Icons/Spider Solitaire.png' },
   { id: 'wordpad', title: 'WordPad', icon: '/icons xp/Windows XP Icons/Wordpad.png' },
 ];
@@ -1050,6 +1063,8 @@ export default function Desktop({ onLogOff, onShutdown }: DesktopProps) {
         return <MediaPlayerContent />;
       case 'cmd':
         return <CommandPromptContent onOpenApp={openWindow} />;
+      case 'gtavc':
+        return <GTAViceCityContent />;
       case 'pinball':
         return <PinballContent />;
       case 'spidersolitaire':
