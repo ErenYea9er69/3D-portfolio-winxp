@@ -189,19 +189,18 @@ export default function InternetExplorerContent() {
               marginBottom: '20px'
             }}>
               <p style={{ fontSize: '11px', color: '#333', marginBottom: '10px', fontWeight: 'bold' }}>
-                My Links (open in new tab):
+                My Links:
               </p>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', flexWrap: 'wrap', fontSize: '11px' }}>
-                <a href="https://github.com/StarKnightt" target="_blank" rel="noopener noreferrer" style={{ color: '#0066cc' }}>💻 GitHub</a>
-                <a href="https://github.com/StarKnightt/windows-xp-portfolio" target="_blank" rel="noopener noreferrer" style={{ color: '#0066cc' }}>⭐ Portfolio Source</a>
-                <a href="https://youtube.com/@Star_Knight12" target="_blank" rel="noopener noreferrer" style={{ color: '#0066cc' }}>📺 YouTube</a>
-                <a href="https://linkedin.com/in/prasenjitnayak" target="_blank" rel="noopener noreferrer" style={{ color: '#0066cc' }}>💼 LinkedIn</a>
-                <a href="https://x.com/Star_Knight12" target="_blank" rel="noopener noreferrer" style={{ color: '#0066cc' }}>🐦 Twitter</a>
+                <button onClick={() => navigateTo('https://github.com/ErenYea9er69')} style={{ color: '#0066cc', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>💻 GitHub</button>
+                <button onClick={() => navigateTo('https://github.com/ErenYea9er69/3D-portfolio-winxp')} style={{ color: '#0066cc', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>⭐ Portfolio Source</button>
+                <button onClick={() => navigateTo('https://youtube.com/')} style={{ color: '#0066cc', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>📺 YouTube</button>
+                <button onClick={() => navigateTo('https://x.com/ErenYea9er')} style={{ color: '#0066cc', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>🐦 Twitter</button>
               </div>
             </div>
 
             <p style={{ fontSize: '9px', color: '#999' }}>
-              Note: GitHub, Twitter, etc. block embedding, so they open in new tabs.
+              Note: Some sites block embedding and may refuse to connect inside this window.
             </p>
           </div>
         </div>
@@ -303,6 +302,7 @@ export default function InternetExplorerContent() {
             src={currentUrl}
             style={{ width: '100%', height: '100%', border: 'none' }}
             title="Browser"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
           />
         )}
       </div>
